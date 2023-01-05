@@ -1,5 +1,6 @@
 package com.example.fotozabawa
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
@@ -53,6 +54,12 @@ class MainActivity : AppCompatActivity() {
         binding.btnTakePhoto.setOnClickListener {
             takePhoto()
         }
+        binding.btnMenu.setOnClickListener {
+            openMenu()
+            Toast.makeText(this,
+                "Open menu",
+                Toast.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -83,6 +90,10 @@ class MainActivity : AppCompatActivity() {
         }
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir
+    }
+
+    private fun openMenu() {
+
     }
 
     private fun takePhoto() {
