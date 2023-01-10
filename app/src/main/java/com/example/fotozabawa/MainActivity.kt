@@ -56,9 +56,6 @@ class MainActivity : AppCompatActivity() {
         }
         binding.btnMenu.setOnClickListener {
             openMenu()
-            Toast.makeText(this,
-                "Open menu",
-                Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -93,7 +90,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openMenu() {
-
+        Toast.makeText(this,
+            "Open menu",
+            Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
     }
 
     private fun takePhoto() {

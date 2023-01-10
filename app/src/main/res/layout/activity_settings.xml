@@ -27,7 +27,9 @@
         android:minHeight="48dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTime" />
+        app:layout_constraintTop_toBottomOf="@id/tvTime"
+        android:textAlignment="center"
+        />
 
     <TextView
         android:id="@+id/tvAmount"
@@ -47,10 +49,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
+        android:layout_marginBottom="217dp"
         android:minHeight="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnConfirm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAmount" />
+        app:layout_constraintTop_toBottomOf="@id/tvAmount"
+        android:textAlignment="center"/>
 
 
     <Button
