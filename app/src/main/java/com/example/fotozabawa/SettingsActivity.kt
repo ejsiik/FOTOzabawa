@@ -1,27 +1,53 @@
 package com.example.fotozabawa
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 
 class SettingsActivity : AppCompatActivity() {
 
+    private lateinit var spinnerT: Spinner
+    private lateinit var spinnerA: Spinner
+    private lateinit var spinnerbPS: Spinner
+    private lateinit var spinneraPS: Spinner
+    private lateinit var spinneraSPS: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
-        val timeTab = arrayOf("1s", "2s", "5s", "10s", "30s")
-        val spinner = findViewById<Spinner>(R.id.spinnerTime)
-        if (spinner != null) {
+        timeSpinner()
+        amountSpinner()
+        beforePhotoSound()
+        afterPhotoSound()
+        afterSeriesSound()
+
+        val confirmButton = findViewById<Button>(R.id.btnConfirm)
+        confirmButton.setOnClickListener {
+            if (spinnerT != null && spinnerT.getSelectedItem() != null ||
+                spinnerA != null && spinnerA.getSelectedItem() != null ||
+                spinneraPS != null && spinneraPS.getSelectedItem() != null ||
+                spinnerbPS != null && spinnerbPS.getSelectedItem() != null ||
+                spinneraSPS != null && spinneraSPS.getSelectedItem() != null) {
+                startActivity(Intent(this@SettingsActivity, MainActivity::class.java))
+            }
+        }
+    }
+
+    fun timeSpinner() {
+        val timeTab = arrayOf("1", "2", "5", "10", "30")
+        spinnerT = findViewById(R.id.spinnerTime)
+        if (spinnerT != null) {
             val adapter = ArrayAdapter(
                 this,
                 android.R.layout.simple_spinner_item, timeTab
             )
-            spinner.adapter = adapter
+            spinnerT.adapter = adapter
         }
-        spinner.onItemSelectedListener = object :
+        spinnerT.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>,
@@ -38,9 +64,11 @@ class SettingsActivity : AppCompatActivity() {
                 ).show()
             }
         }
+    }
 
+    fun amountSpinner() {
         val amountTab = arrayOf("1", "2", "5", "10", "30")
-        val spinnerA = findViewById<Spinner>(R.id.spinnerAmount)
+        spinnerA = findViewById(R.id.spinnerAmount)
         if (spinnerA != null) {
             val adapter = ArrayAdapter(
                 this,
@@ -65,11 +93,91 @@ class SettingsActivity : AppCompatActivity() {
                 ).show()
             }
         }
+    }
 
-        val confirmButton = findViewById<Button>(R.id.btnConfirm)
-        confirmButton.setOnClickListener {
-            if (spinner != null && spinner.getSelectedItem() != null || spinnerA != null && spinnerA.getSelectedItem() != null) {
-                // TODO set time interval and amount of photos on takePhotoButton
+    fun beforePhotoSound() {
+        val bpsTab = arrayOf("1", "2", "3", "4")
+        spinnerbPS = findViewById(R.id.spinnerbPS)
+        if (spinnerbPS != null) {
+            val adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_item, bpsTab
+            )
+            spinnerbPS.adapter = adapter
+        }
+        spinnerbPS.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View, position: Int, id: Long
+            ) {
+                Toast.makeText(
+                    this@SettingsActivity, bpsTab[position], Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                Toast.makeText(
+                    this@SettingsActivity, "Nothing selected", Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    fun afterPhotoSound() {
+        val apsTab = arrayOf("1", "2", "3", "4")
+        spinneraPS = findViewById(R.id.spinneraPS)
+        if (spinneraPS != null) {
+            val adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_item, apsTab
+            )
+            spinneraPS.adapter = adapter
+        }
+        spinneraPS.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View, position: Int, id: Long
+            ) {
+                Toast.makeText(
+                    this@SettingsActivity, apsTab[position], Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                Toast.makeText(
+                    this@SettingsActivity, "Nothing selected", Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    fun afterSeriesSound() {
+        val aspsTab = arrayOf("1", "2", "3", "4")
+        spinneraSPS = findViewById(R.id.spinneraSPS)
+        if (spinneraSPS != null) {
+            val adapter = ArrayAdapter(
+                this,
+                android.R.layout.simple_spinner_item, aspsTab
+            )
+            spinneraSPS.adapter = adapter
+        }
+        spinneraSPS.onItemSelectedListener = object :
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View, position: Int, id: Long
+            ) {
+                Toast.makeText(
+                    this@SettingsActivity, aspsTab[position], Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>) {
+                Toast.makeText(
+                    this@SettingsActivity, "Nothing selected", Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

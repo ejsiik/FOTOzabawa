@@ -2,8 +2,11 @@ package com.example.fotozabawa
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.media.MediaPlayer
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -14,6 +17,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.os.postDelayed
 import com.example.fotozabawa.databinding.ActivityMainBinding
 import java.io.File
 import java.text.SimpleDateFormat
@@ -33,11 +37,21 @@ class MainActivity : AppCompatActivity() {
     private var imageCapture: ImageCapture? = null
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor:ExecutorService
+    private lateinit var mediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        var counter = 0
+        val maxPhotos = 3
+        val interval: Long = 10000 // interval set by user in milliseconds
+
+        val intervalBP: Long = 1000 //before photo
+        val intervalAP: Long = 1000 // after photo
+        val intervalASP: Long = 2500 // after series of photos
+        val lastInterval:Long = interval-intervalBP-intervalAP// interval between photos
 
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -52,11 +66,51 @@ class MainActivity : AppCompatActivity() {
             )
         }
         binding.btnTakePhoto.setOnClickListener {
-            takePhoto()
+            var handler = Handler()
+            if (counter < maxPhotos) {
+                try { // play the sound
+                    playTune()
+                    handler.postDelayed({
+                    takePhoto()
+                    }, intervalBP)
+                    counter++
+                    try {
+                        handler.postDelayed({
+                        playCustomTune()
+                        }, intervalAP)
+                    } catch (e: java.lang.Exception) {
+                        e.printStackTrace()
+                    }
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                }
+                if (counter < maxPhotos) {
+                    handler.postDelayed({
+                        binding.btnTakePhoto.performClick()
+                    }, lastInterval)
+                } else {
+                    counter = 0
+                    handler.postDelayed({
+                    playCustomTune()
+                    }, intervalASP)
+                }
+            }
         }
         binding.btnMenu.setOnClickListener {
             openMenu()
         }
+    }
+
+    private fun playTune() { // default notify ringtone
+        val notification =
+            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val sound = RingtoneManager.getRingtone(applicationContext, notification)
+        sound.play()
+    }
+
+    private fun playCustomTune() { // custom
+        val track: MediaPlayer? = MediaPlayer.create(applicationContext, R.raw.notify1)
+        track?.start()
     }
 
 
@@ -118,7 +172,7 @@ class MainActivity : AppCompatActivity() {
 
                     Toast.makeText(this@MainActivity,
                         "$msg $savedUri",
-                        Toast.LENGTH_LONG
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
 
@@ -166,6 +220,7 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
+        mediaPlayer.release()
     }
 
 }
