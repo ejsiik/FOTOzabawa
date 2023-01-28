@@ -27,13 +27,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val confirmButton = findViewById<Button>(R.id.btnConfirm)
         confirmButton.setOnClickListener {
-            if (spinnerT != null && spinnerT.getSelectedItem() != null ||
-                spinnerA != null && spinnerA.getSelectedItem() != null ||
-                spinneraPS != null && spinneraPS.getSelectedItem() != null ||
-                spinnerbPS != null && spinnerbPS.getSelectedItem() != null ||
-                spinneraSPS != null && spinneraSPS.getSelectedItem() != null) {
                 startActivity(Intent(this@SettingsActivity, MainActivity::class.java))
-            }
         }
     }
 
