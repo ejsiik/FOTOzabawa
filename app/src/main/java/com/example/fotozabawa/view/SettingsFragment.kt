@@ -11,6 +11,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
+import com.example.fotozabawa.model.entity.Model
+import com.example.fotozabawa.model.repository.ModelRepository
+import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_settings.view.*
 
 class SettingsFragment : Fragment() {
@@ -20,6 +23,8 @@ class SettingsFragment : Fragment() {
     private lateinit var spinnerbPS: Spinner
     private lateinit var spinneraPS: Spinner
     private lateinit var spinneraSPS: Spinner
+    private lateinit var modelRepository: ModelRepository
+    private lateinit var viewModel: SettingsViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,6 +39,14 @@ class SettingsFragment : Fragment() {
         afterSeriesSound(view)
 
         view.btnConfirm.setOnClickListener{
+            val time = spinnerT.selectedItemId.toInt()
+            val amount = spinnerA.selectedItemId.toInt()
+            val bps = spinnerbPS.selectedItemId.toInt()
+            val aps = spinneraPS.selectedItemId.toInt()
+            val asps = spinneraSPS.selectedItemId.toInt()
+            val model = Model (0, time, amount, bps, aps, asps)
+            viewModel.addSettings(model)
+            Toast.makeText(requireContext(), "Zmieniono ustawienia", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_settingsFragment_to_fotoFragment)
         }
 
@@ -41,146 +54,81 @@ class SettingsFragment : Fragment() {
     }
 
     fun timeSpinner(view: View) {
-        val timeTab = arrayOf("1", "2", "5", "10", "30")
-        spinnerT = view.findViewById(R.id.spinnerTime)
-        val adapter = context?.let {
-            ArrayAdapter(
+        spinnerT = view.spinnerTime
+        context?.let {
+            ArrayAdapter.createFromResource(
                 it,
-                android.R.layout.simple_spinner_item, timeTab
-            )
-        }
-        spinnerT.adapter = adapter
-        spinnerT.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                Toast.makeText(
-                    context, timeTab[position], Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Toast.makeText(
-                    context, "Nothing selected", Toast.LENGTH_SHORT
-                ).show()
+                R.array.time_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                spinnerT.adapter = adapter
             }
         }
     }
 
     fun amountSpinner(view: View) {
-        val amountTab = arrayOf("1", "2", "5", "10", "30")
-        spinnerA = view.findViewById(R.id.spinnerAmount)
-        val adapter = context?.let {
-            ArrayAdapter(
+        spinnerA = view.spinnerAmount
+        context?.let {
+            ArrayAdapter.createFromResource(
                 it,
-                android.R.layout.simple_spinner_item, amountTab
-            )
-        }
-        spinnerA.adapter = adapter
-        spinnerA.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                Toast.makeText(
-                    context, amountTab[position], Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Toast.makeText(
-                    context, "Nothing selected", Toast.LENGTH_SHORT
-                ).show()
+                R.array.time_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                spinnerA.adapter = adapter
             }
         }
     }
 
     fun beforePhotoSound(view: View) {
-        val bpsTab = arrayOf("1", "2", "3", "4")
-        spinnerbPS = view.findViewById(R.id.spinnerbPS)
-        val adapter = context?.let {
-            ArrayAdapter(
+        spinnerbPS = view.spinnerbPS
+        context?.let {
+            ArrayAdapter.createFromResource(
                 it,
-                android.R.layout.simple_spinner_item, bpsTab
-            )
-        }
-        spinnerbPS.adapter = adapter
-        spinnerbPS.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                Toast.makeText(
-                    context, bpsTab[position], Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Toast.makeText(
-                    context, "Nothing selected", Toast.LENGTH_SHORT
-                ).show()
+                R.array.sound_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                spinnerbPS.adapter = adapter
             }
         }
     }
 
     fun afterPhotoSound(view: View) {
-        val apsTab = arrayOf("1", "2", "3", "4")
-        spinneraPS = view.findViewById(R.id.spinneraPS)
-        val adapter = context?.let {
-            ArrayAdapter(
+        spinneraPS = view.spinneraPS
+        context?.let {
+            ArrayAdapter.createFromResource(
                 it,
-                android.R.layout.simple_spinner_item, apsTab
-            )
-        }
-        spinneraPS.adapter = adapter
-        spinneraPS.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                Toast.makeText(
-                    context, apsTab[position], Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Toast.makeText(
-                    context, "Nothing selected", Toast.LENGTH_SHORT
-                ).show()
+                R.array.sound_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                spinneraPS.adapter = adapter
             }
         }
     }
 
     fun afterSeriesSound(view: View) {
-        val aspsTab = arrayOf("1", "2", "3", "4")
-        spinneraSPS = view.findViewById(R.id.spinneraSPS)
-        val adapter = context?.let {
-            ArrayAdapter(
+        spinneraSPS = view.spinneraSPS
+        context?.let {
+            ArrayAdapter.createFromResource(
                 it,
-                android.R.layout.simple_spinner_item, aspsTab
-            )
-        }
-        spinneraSPS.adapter = adapter
-        spinneraSPS.onItemSelectedListener = object :
-            AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View, position: Int, id: Long
-            ) {
-                Toast.makeText(
-                    context, aspsTab[position], Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                Toast.makeText(
-                    context, "Nothing selected", Toast.LENGTH_SHORT
-                ).show()
+                R.array.sound_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                spinneraSPS.adapter = adapter
             }
         }
     }

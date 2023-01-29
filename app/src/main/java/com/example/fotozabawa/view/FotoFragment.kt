@@ -19,9 +19,12 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.databinding.FragmentFotoBinding
+import com.example.fotozabawa.model.repository.ModelRepository
+import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
 import java.io.File
 import java.text.SimpleDateFormat
@@ -42,6 +45,7 @@ class FotoFragment : Fragment() {
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var viewModel: SettingsViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,14 +55,16 @@ class FotoFragment : Fragment() {
 
         binding = FragmentFotoBinding.inflate(layoutInflater)
 
+        viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
+
         var counter = 0
-        val maxPhotos = 3
-        val interval: Long = 10000 // interval set by user in milliseconds
+        val maxPhotos = viewModel.getSettings().value?.count
+        val interval: Int? = viewModel.getSettings().value?.time // interval set by user in milliseconds
 
         val intervalBP: Long = 1000 //before photo
         val intervalAP: Long = 1000 // after photo
         val intervalASP: Long = 2500 // after series of photos
-        val lastInterval:Long = interval-intervalBP-intervalAP// interval between photos
+        val lastInterval:Long = interval!! -intervalBP-intervalAP// interval between photos
 
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -72,9 +78,13 @@ class FotoFragment : Fragment() {
                 REQUEST_CODE_PERMISSIONS
             )
         }
-        binding.btnTakePhoto.setOnClickListener {
+        view.btnTakePhoto.setOnClickListener {
+            viewModel.getSettings().value?.time?.let { it1 ->
+                Toast.makeText(requireContext(),
+                    it1, Toast.LENGTH_SHORT).show()
+            }
             var handler = Handler()
-            if (counter < maxPhotos) {
+            if (counter < maxPhotos!!) {
                 try { // play the sound
                     playTune()
                     handler.postDelayed({
@@ -93,7 +103,7 @@ class FotoFragment : Fragment() {
                 }
                 if (counter < maxPhotos) {
                     handler.postDelayed({
-                        binding.btnTakePhoto.performClick()
+                        view.btnTakePhoto.performClick()
                     }, lastInterval)
                 } else {
                     counter = 0

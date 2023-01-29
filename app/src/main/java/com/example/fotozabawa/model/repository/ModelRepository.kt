@@ -1,5 +1,6 @@
 package com.example.fotozabawa.model.repository
 
+import androidx.lifecycle.LiveData
 import com.example.fotozabawa.model.dao.ModelDao
 import com.example.fotozabawa.model.entity.Model
 
@@ -8,7 +9,7 @@ class ModelRepository(private val modelDao: ModelDao) {
         modelDao.addSettings(model)
     }
 
-    fun getAllSettings(): Model{
+    fun getAllSettings(): LiveData<Model> {
         return modelDao.getAllSettings()
     }
 }

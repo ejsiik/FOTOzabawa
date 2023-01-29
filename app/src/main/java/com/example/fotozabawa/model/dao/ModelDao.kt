@@ -1,5 +1,6 @@
 package com.example.fotozabawa.model.dao
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -12,5 +13,5 @@ interface ModelDao {
     fun addSettings(model: Model)
 
     @Query("SELECT * FROM model")
-    fun getAllSettings() : Model
+    fun getAllSettings() : LiveData<Model>
 }
