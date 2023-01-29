@@ -1,6 +1,5 @@
 package com.example.fotozabawa.view
 
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
@@ -8,7 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,16 +18,16 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.example.fotozabawa.*
-import com.example.fotozabawa.databinding.ActivityMainBinding
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.fotozabawa.R
 import com.example.fotozabawa.databinding.FragmentFotoBinding
+import kotlinx.android.synthetic.main.fragment_foto.view.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-
 
 
 class FotoFragment : Fragment() {
@@ -105,7 +103,7 @@ class FotoFragment : Fragment() {
                 }
             }
         }
-        binding.btnMenu.setOnClickListener {
+        view.btnMenu.setOnClickListener {
             openMenu()
         }
         return view
@@ -156,7 +154,7 @@ class FotoFragment : Fragment() {
         Toast.makeText(requireContext(),
             "Open menu",
             Toast.LENGTH_SHORT).show()
-        startActivity(Intent(requireActivity(), SettingsActivity::class.java))
+        findNavController().navigate(R.id.action_fotoFragment_to_settingsFragment)
     }
 
     private fun takePhoto() {
@@ -194,17 +192,12 @@ class FotoFragment : Fragment() {
     }
 
     private fun startCamera() {
-
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-            val preview = Preview.Builder().build().also {
-                    mPreview ->
-                mPreview.setSurfaceProvider(
-                    binding.viewFinder.surfaceProvider
-                )
-            }
+            val preview = Preview.Builder().build().also{
+                it.setSurfaceProvider(view?.viewFinder?.surfaceProvider) }
 
             imageCapture = ImageCapture.Builder().build()
 
