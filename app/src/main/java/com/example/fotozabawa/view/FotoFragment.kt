@@ -59,12 +59,8 @@ class FotoFragment : Fragment() {
 
         var counter = 0
         val maxPhotos = viewModel.getSettings().value?.count
-        val interval: Int? = viewModel.getSettings().value?.time // interval set by user in milliseconds
+        val interval: Long? = viewModel.getSettings().value?.time // interval set by user in milliseconds
 
-        val intervalBP: Long = 1000 //before photo
-        val intervalAP: Long = 1000 // after photo
-        val intervalASP: Long = 2500 // after series of photos
-        val lastInterval:Long = interval!! -intervalBP-intervalAP// interval between photos
 
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -79,11 +75,7 @@ class FotoFragment : Fragment() {
             )
         }
         view.btnTakePhoto.setOnClickListener {
-            viewModel.getSettings().value?.time?.let { it1 ->
-                Toast.makeText(requireContext(),
-                    it1, Toast.LENGTH_SHORT).show()
-            }
-            var handler = Handler()
+            /*var handler = Handler()
             if (counter < maxPhotos!!) {
                 try { // play the sound
                     playTune()
@@ -101,7 +93,7 @@ class FotoFragment : Fragment() {
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                 }
-                if (counter < maxPhotos) {
+                /*if (counter < maxPhotos) {
                     handler.postDelayed({
                         view.btnTakePhoto.performClick()
                     }, lastInterval)
@@ -110,8 +102,8 @@ class FotoFragment : Fragment() {
                     handler.postDelayed({
                         playCustomTune()
                     }, intervalASP)
-                }
-            }
+                }*/
+            }*/
         }
         view.btnMenu.setOnClickListener {
             openMenu()

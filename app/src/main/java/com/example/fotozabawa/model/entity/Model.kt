@@ -4,5 +4,11 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "model")
-data class Model (@PrimaryKey val id : Int, val time : Int, val count : Int, val soundBefore : Int,
-    val soundAfter : Int, val soundFinish : Int)
+data class Model (
+    @PrimaryKey val id : Int,
+    val time : Long,
+    val count : Int,
+    val soundBefore : Int,
+    val soundAfter : Int,
+    val soundFinish : Int
+    )

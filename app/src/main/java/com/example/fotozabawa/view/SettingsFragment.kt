@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.model.entity.Model
@@ -32,6 +33,7 @@ class SettingsFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
+        viewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
         timeSpinner(view)
         amountSpinner(view)
         beforePhotoSound(view)
@@ -39,7 +41,7 @@ class SettingsFragment : Fragment() {
         afterSeriesSound(view)
 
         view.btnConfirm.setOnClickListener{
-            val time = spinnerT.selectedItemId.toInt()
+            val time = spinnerT.selectedItemId
             val amount = spinnerA.selectedItemId.toInt()
             val bps = spinnerbPS.selectedItemId.toInt()
             val aps = spinneraPS.selectedItemId.toInt()
