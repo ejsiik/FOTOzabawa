@@ -19,19 +19,24 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.databinding.FragmentFotoBinding
 import com.example.fotozabawa.model.SoundManager
+import com.example.fotozabawa.model.entity.Model
 import com.example.fotozabawa.model.repository.ModelRepository
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.properties.Delegates
 
 
 class FotoFragment : Fragment() {
@@ -54,19 +59,31 @@ class FotoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_foto, container, false)
-
+        var maxPhotos: Int = 2
+        var interval: Long = 5000
+        var beforeSound: Int = 1
+        var afterSound: Int = 2
+        var endSound: Int = 3
         binding = FragmentFotoBinding.inflate(layoutInflater)
 
-        viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
+        //viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
+        val viewModel = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
 
         var counter = 0
 
         // NULL POINTER EXCEPTION
-        val maxPhotos = viewModel.getSettings().value?.count
+        viewModel.getSettings().observe(viewLifecycleOwner, Observer<Model> { model ->
+            maxPhotos = model.count
+            interval = model.time
+            beforeSound = model.soundBefore
+            afterSound = model.soundAfter
+            endSound = model.soundFinish
+        })
+        /*val maxPhotos = viewModel.getSettings().value?.count
         val interval: Long? = viewModel.getSettings().value?.time
         val beforeSound = viewModel.getSettings().value?.soundBefore
         val afterSound = viewModel.getSettings().value?.soundAfter
-        val endSound = viewModel.getSettings().value?.soundFinish
+        val endSound = viewModel.getSettings().value?.soundFinish*/
 
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -82,14 +99,18 @@ class FotoFragment : Fragment() {
         }
         view.btnTakePhoto.setOnClickListener {
             val handler = Handler()
-            if (counter < maxPhotos!!) {
+            if (counter < maxPhotos) {
                 try { // play the sound
-                    soundManager.playBeforePictureSound(beforeSound!!)
+                    soundManager.playBeforePictureSound(beforeSound)
                     handler.postDelayed({
                         takePhoto()
                     }, 2000) // to be configured
                     counter++
-                    soundManager.playAfterPictureSound(afterSound!!)
+                    try {
+                        soundManager.playAfterPictureSound(afterSound)
+                    } catch (e: java.lang.Exception) {
+                        e.printStackTrace()
+                    }
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                 }

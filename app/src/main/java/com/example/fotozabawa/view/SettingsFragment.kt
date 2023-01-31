@@ -34,6 +34,7 @@ class SettingsFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
 
         viewModel = ViewModelProvider(this).get(SettingsViewModel::class.java)
+
         timeSpinner(view)
         amountSpinner(view)
         beforePhotoSound(view)

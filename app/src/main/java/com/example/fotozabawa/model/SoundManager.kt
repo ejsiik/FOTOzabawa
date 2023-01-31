@@ -21,7 +21,7 @@ class SoundManager(private val context: Context) {
             2 -> R.raw.notify2
             3 -> R.raw.notify3
             4 -> R.raw.notify4
-            else -> R.raw.notify2
+            else -> R.raw.notify1
         }
         val track: MediaPlayer? = MediaPlayer.create(context, soundId)
         track?.start()
@@ -45,7 +45,7 @@ class SoundManager(private val context: Context) {
             2 -> R.raw.notify2
             3 -> R.raw.notify3
             4 -> R.raw.notify4
-            else -> R.raw.notify2
+            else -> R.raw.notify3
         }
         val track: MediaPlayer? = MediaPlayer.create(context, soundId)
         track?.start()
