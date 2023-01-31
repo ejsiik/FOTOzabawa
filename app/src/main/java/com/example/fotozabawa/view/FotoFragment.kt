@@ -23,6 +23,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.databinding.FragmentFotoBinding
+import com.example.fotozabawa.model.SoundManager
 import com.example.fotozabawa.model.repository.ModelRepository
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
@@ -46,6 +47,7 @@ class FotoFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var viewModel: SettingsViewModel
+    private lateinit var soundManager: SoundManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,9 +60,13 @@ class FotoFragment : Fragment() {
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
 
         var counter = 0
-        val maxPhotos = viewModel.getSettings().value?.count
-        val interval: Long? = viewModel.getSettings().value?.time // interval set by user in milliseconds
 
+        // NULL POINTER EXCEPTION
+        val maxPhotos = viewModel.getSettings().value?.count
+        val interval: Long? = viewModel.getSettings().value?.time
+        val beforeSound = viewModel.getSettings().value?.soundBefore
+        val afterSound = viewModel.getSettings().value?.soundAfter
+        val endSound = viewModel.getSettings().value?.soundFinish
 
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -75,6 +81,34 @@ class FotoFragment : Fragment() {
             )
         }
         view.btnTakePhoto.setOnClickListener {
+            val handler = Handler()
+            if (counter < maxPhotos!!) {
+                try { // play the sound
+                    soundManager.playBeforePictureSound(beforeSound!!)
+                    handler.postDelayed({
+                        takePhoto()
+                    }, 2000) // to be configured
+                    counter++
+                    soundManager.playAfterPictureSound(afterSound!!)
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                }
+                if (counter < maxPhotos) {
+                        handler.postDelayed({
+                            view.btnTakePhoto.performClick()
+                        }, interval?.minus(2000) ?: 5000) // to be configured
+                } else {
+                    counter = 0
+                    handler.postDelayed({
+                        try {
+                            soundManager.playEndSeriesSound(endSound!!)
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
+                        }
+                    }, 1000)
+                }
+            }
+
             /*var handler = Handler()
             if (counter < maxPhotos!!) {
                 try { // play the sound
@@ -110,7 +144,7 @@ class FotoFragment : Fragment() {
         }
         return view
     }
-    private fun playTune() { // default notify ringtone
+    /*private fun playTune() { // default notify ringtone
         val notification =
             RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val sound = RingtoneManager.getRingtone(context, notification)
@@ -120,7 +154,7 @@ class FotoFragment : Fragment() {
     private fun playCustomTune() { // custom
         val track: MediaPlayer? = MediaPlayer.create(context, R.raw.notify1)
         track?.start()
-    }
+    }*/
 
 
     override fun onRequestPermissionsResult(

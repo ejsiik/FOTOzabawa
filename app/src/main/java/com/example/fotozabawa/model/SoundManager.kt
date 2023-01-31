@@ -15,18 +15,39 @@ class SoundManager(private val context: Context) {
         endSeriesSound = MediaPlayer.create(context, R.raw.notify3)
     }*/
 
-    fun playBeforePictureSound() {
-        val track: MediaPlayer? = MediaPlayer.create(context, R.raw.notify1) // sound to be configured
+    fun playBeforePictureSound(id: Int) {
+        val soundId = when (id) {
+            1 -> R.raw.notify1
+            2 -> R.raw.notify2
+            3 -> R.raw.notify3
+            4 -> R.raw.notify4
+            else -> R.raw.notify2
+        }
+        val track: MediaPlayer? = MediaPlayer.create(context, soundId)
         track?.start()
     }
 
-    fun playAfterPictureSound() {
-        val track: MediaPlayer? = MediaPlayer.create(context, R.raw.notify2)
+    fun playAfterPictureSound(id: Int) {
+        val soundId = when (id) {
+            1 -> R.raw.notify1
+            2 -> R.raw.notify2
+            3 -> R.raw.notify3
+            4 -> R.raw.notify4
+            else -> R.raw.notify2
+        }
+        val track: MediaPlayer? = MediaPlayer.create(context, soundId)
         track?.start()
     }
 
-    fun playEndSeriesSound() {
-        val track: MediaPlayer? = MediaPlayer.create(context, R.raw.notify3)
+    fun playEndSeriesSound(id: Int) {
+        val soundId = when (id) {
+            1 -> R.raw.notify1
+            2 -> R.raw.notify2
+            3 -> R.raw.notify3
+            4 -> R.raw.notify4
+            else -> R.raw.notify2
+        }
+        val track: MediaPlayer? = MediaPlayer.create(context, soundId)
         track?.start()
     }
 }
