@@ -25,8 +25,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun getSettings(): LiveData<Model> {
-        return modelRepository.getAllSettings()
+    fun getSettings(): Model {
+        return modelRepository.getSettings()
     }
 
 }

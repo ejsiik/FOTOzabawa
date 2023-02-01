@@ -9,7 +9,7 @@ class ModelRepository(private val modelDao: ModelDao) {
         modelDao.addSettings(model)
     }
 
-    fun getAllSettings(): LiveData<Model> {
-        return modelDao.getAllSettings()
+    fun getSettings(): Model {
+        return modelDao.getSettings()
     }
 }

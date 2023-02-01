@@ -12,6 +12,6 @@ interface ModelDao {
     @Insert
     fun addSettings(model: Model)
 
-    @Query("SELECT * FROM model")
-    fun getAllSettings() : LiveData<Model>
+    @Query("SELECT * FROM model LIMIT 1")
+    fun getSettings() : Model
 }
