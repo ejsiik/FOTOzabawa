@@ -73,7 +73,7 @@ class FotoFragment : Fragment() {
             val tmpModel = viewModel.getSettings()
             tmpModel?.let {
                 maxPhotos = it.count.toInt()
-                interval = it.time.toLong()*1000
+                interval = it.time.toLong() * 1000
                 beforeSound = it.soundBefore
                 afterSound = it.soundAfter
                 endSound = it.soundFinish
