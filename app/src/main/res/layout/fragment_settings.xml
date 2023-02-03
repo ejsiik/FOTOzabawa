@@ -34,7 +34,8 @@ android:minHeight="36dp"
 android:textAlignment="center"
 app:layout_constraintEnd_toEndOf="parent"
 app:layout_constraintStart_toStartOf="parent"
-app:layout_constraintTop_toBottomOf="@id/tvTime" />
+app:layout_constraintTop_toBottomOf="@id/tvTime"
+    android:gravity="center"/>
 
 <TextView
 android:id="@+id/tvAmount"
@@ -59,7 +60,8 @@ android:minHeight="36dp"
 android:textAlignment="center"
 app:layout_constraintEnd_toEndOf="parent"
 app:layout_constraintStart_toStartOf="parent"
-app:layout_constraintTop_toBottomOf="@id/tvAmount" />
+app:layout_constraintTop_toBottomOf="@id/tvAmount"
+    android:gravity="center"/>
 
 
 <TextView

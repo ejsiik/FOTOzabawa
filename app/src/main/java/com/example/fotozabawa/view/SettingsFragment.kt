@@ -9,11 +9,14 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.model.entity.Model
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_settings.view.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SettingsFragment : Fragment() {
 
@@ -69,6 +72,14 @@ class SettingsFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 // Apply the adapter to the spinner
                 spinnerT.adapter = adapter
+                lifecycleScope.launch(Dispatchers.IO){
+                    val tmpModel = viewModel.getSettings()
+                    tmpModel?.let {
+                        val actualIndex = it.time
+                        val storedValueIndex = adapter.getPosition(actualIndex)
+                        spinnerT.setSelection(storedValueIndex)
+                    }
+                }
             }
         }
     }
@@ -85,6 +96,14 @@ class SettingsFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 // Apply the adapter to the spinner
                 spinnerA.adapter = adapter
+                lifecycleScope.launch(Dispatchers.IO){
+                    val tmpModel = viewModel.getSettings()
+                    tmpModel?.let {
+                        val actualIndex = it.count
+                        val storedValueIndex = adapter.getPosition(actualIndex)
+                        spinnerA.setSelection(storedValueIndex)
+                    }
+                }
             }
         }
     }
@@ -101,6 +120,14 @@ class SettingsFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 // Apply the adapter to the spinner
                 spinnerbPS.adapter = adapter
+                lifecycleScope.launch(Dispatchers.IO){
+                    val tmpModel = viewModel.getSettings()
+                    tmpModel?.let {
+                        val actualIndex = (it.soundBefore + 1).toString()
+                        val storedValueIndex = adapter.getPosition(actualIndex)
+                        spinnerbPS.setSelection(storedValueIndex)
+                    }
+                }
             }
         }
     }
@@ -117,6 +144,14 @@ class SettingsFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 // Apply the adapter to the spinner
                 spinneraPS.adapter = adapter
+                lifecycleScope.launch(Dispatchers.IO){
+                    val tmpModel = viewModel.getSettings()
+                    tmpModel?.let {
+                        val actualIndex = (it.soundAfter + 1).toString()
+                        val storedValueIndex = adapter.getPosition(actualIndex)
+                        spinneraPS.setSelection(storedValueIndex)
+                    }
+                }
             }
         }
     }
@@ -133,6 +168,14 @@ class SettingsFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 // Apply the adapter to the spinner
                 spinneraSPS.adapter = adapter
+                lifecycleScope.launch(Dispatchers.IO){
+                    val tmpModel = viewModel.getSettings()
+                    tmpModel?.let {
+                        val actualIndex = (it.soundFinish + 1).toString()
+                        val storedValueIndex = adapter.getPosition(actualIndex)
+                        spinneraSPS.setSelection(storedValueIndex)
+                    }
+                }
             }
         }
     }
@@ -149,6 +192,14 @@ class SettingsFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 // Apply the adapter to the spinner
                 spinnerTBS.adapter = adapter
+                lifecycleScope.launch(Dispatchers.IO){
+                    val tmpModel = viewModel.getSettings()
+                    tmpModel?.let {
+                        val actualIndex = it.timeBeforePhotoSound
+                        val storedValueIndex = adapter.getPosition(actualIndex)
+                        spinnerTBS.setSelection(storedValueIndex)
+                    }
+                }
             }
         }
     }
