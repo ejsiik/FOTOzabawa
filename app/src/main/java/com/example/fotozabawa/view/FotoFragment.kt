@@ -58,7 +58,7 @@ class FotoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_foto, container, false)
-
+        soundManager = SoundManager(requireContext())
 
         var maxPhotos: Int = 2
         var interval: Long = 5000
