@@ -24,6 +24,8 @@ class SettingsFragment : Fragment() {
     private lateinit var spinnerbPS: Spinner
     private lateinit var spinneraPS: Spinner
     private lateinit var spinneraSPS: Spinner
+    private lateinit var spinnerTBS: Spinner
+
     private lateinit var modelRepository: ModelRepository
     private lateinit var viewModel: SettingsViewModel
 
@@ -40,14 +42,17 @@ class SettingsFragment : Fragment() {
         beforePhotoSound(view)
         afterPhotoSound(view)
         afterSeriesSound(view)
+        timeBeforePhotoSoundSpinner(view)
 
         view.btnConfirm.setOnClickListener{
-            val time = spinnerT.selectedItemId
-            val amount = spinnerA.selectedItemId.toInt()
+            val time = spinnerT.selectedItem.toString()
+            val amount = spinnerA.selectedItem.toString()
             val bps = spinnerbPS.selectedItemId.toInt()
             val aps = spinneraPS.selectedItemId.toInt()
             val asps = spinneraSPS.selectedItemId.toInt()
-            val model = Model (0, time, amount, bps, aps, asps)
+            val tbps = spinnerTBS.selectedItem.toString()
+
+            val model = Model (0, time, amount, bps, aps, asps, tbps)
             viewModel.addSettings(model)
             Toast.makeText(requireContext(), "Zmieniono ustawienia", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_settingsFragment_to_fotoFragment)
@@ -132,6 +137,22 @@ class SettingsFragment : Fragment() {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 // Apply the adapter to the spinner
                 spinneraSPS.adapter = adapter
+            }
+        }
+    }
+
+    fun timeBeforePhotoSoundSpinner(view: View) {
+        spinnerTBS = view.spinnerTimeBefore
+        context?.let {
+            ArrayAdapter.createFromResource(
+                it,
+                R.array.time_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                spinnerTBS.adapter = adapter
             }
         }
     }

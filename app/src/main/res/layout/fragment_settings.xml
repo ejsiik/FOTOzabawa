@@ -1,151 +1,186 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".view.SettingsFragment">
+android:layout_height="match_parent"
+    tools:context=".view.SettingsFragment"
+    android:layout_gravity="center">
 
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Time interval"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+<TextView
+    android:id="@+id/tvTime"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="32dp"
+    android:text="Time interval [s]"
+    android:textAlignment="center"
+    android:textSize="20sp"
+    android:textStyle="bold"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
 
-    <Spinner
-        android:id="@+id/spinnerTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:contentDescription="@string/app_name"
-        android:minHeight="48dp"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvTime" />
+<Spinner
+android:id="@+id/spinnerTime"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:contentDescription="@string/app_name"
+android:minHeight="36dp"
+android:textAlignment="center"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@id/tvTime" />
 
-    <TextView
-        android:id="@+id/tvAmount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Amount of photos"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/spinnerTime" />
+<TextView
+android:id="@+id/tvAmount"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:text="Amount of photos"
+android:textAlignment="center"
+android:textSize="20sp"
+android:textStyle="bold"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@id/spinnerTime" />
 
-    <Spinner
-        android:id="@+id/spinnerAmount"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:contentDescription="yes"
-        android:minHeight="48dp"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAmount" />
+<Spinner
+android:id="@+id/spinnerAmount"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:contentDescription="yes"
+android:minHeight="36dp"
+android:textAlignment="center"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@id/tvAmount" />
 
 
-    <TextView
-        android:id="@+id/tvbPS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Before photo sound"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerAmount" />
+<TextView
+android:id="@+id/tvbPS"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:text="Before photo sound"
+android:textAlignment="center"
+android:textSize="20sp"
+android:textStyle="bold"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.5"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/spinnerAmount" />
 
-    <Spinner
-        android:id="@+id/spinnerbPS"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:minHeight="48dp"
-        android:textAlignment="center"
-        android:text="text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvbPS" />
+<Spinner
+android:id="@+id/spinnerbPS"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:contentDescription="yes"
+android:minHeight="36dp"
+android:text="text"
+android:textAlignment="center"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.5"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/tvbPS" />
 
-    <TextView
-        android:id="@+id/tvaPS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="After photo sound"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerbPS" />
+<TextView
+android:id="@+id/tvaPS"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:text="After photo sound"
+android:textAlignment="center"
+android:textSize="20sp"
+android:textStyle="bold"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.5"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/spinnerbPS" />
 
-    <Spinner
-        android:id="@+id/spinneraPS"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:contentDescription="yes"
-        android:minHeight="48dp"
-        android:textAlignment="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvaPS" />
+<Spinner
+android:id="@+id/spinneraPS"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:contentDescription="yes"
+android:minHeight="36dp"
+android:textAlignment="center"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.5"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/tvaPS" />
 
-    <TextView
-        android:id="@+id/tvaSPS"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="After a series of photos sound"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinneraPS" />
+<TextView
+android:id="@+id/tvaSPS"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:text="After a series of photos sound"
+android:textAlignment="center"
+android:textSize="20sp"
+android:textStyle="bold"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.5"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/spinneraPS" />
 
-    <Spinner
-        android:id="@+id/spinneraSPS"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:minHeight="48dp"
-        android:textAlignment="center"
-        android:contentDescription="yes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvaSPS" />
+<Spinner
+android:id="@+id/spinneraSPS"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:contentDescription="yes"
+android:minHeight="36dp"
+android:textAlignment="center"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.5"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/tvaSPS" />
 
-    <Button
-        android:id="@+id/btnConfirm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="64dp"
-        android:text="Confirm"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+<TextView
+android:id="@+id/tvTimeBefore"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:text="Time before photo sound [s]"
+android:textAlignment="center"
+android:textSize="20sp"
+android:textStyle="bold"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.5"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/spinneraSPS" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+<Spinner
+android:id="@+id/spinnerTimeBefore"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:contentDescription="yes"
+android:minHeight="36dp"
+android:textAlignment="center"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintHorizontal_bias="0.5"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/tvTimeBefore" />
+
+<Button
+android:id="@+id/btnConfirm"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:layout_marginTop="24dp"
+android:text="Confirm"
+app:layout_constraintEnd_toEndOf="parent"
+app:layout_constraintStart_toStartOf="parent"
+app:layout_constraintTop_toBottomOf="@+id/spinnerTimeBefore" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>

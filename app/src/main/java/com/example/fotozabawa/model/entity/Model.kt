@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "model")
 data class Model (
     @PrimaryKey val id : Int,
-    val time : Long,
-    val count : Int,
+    val time : String,
+    val count : String,
     val soundBefore : Int,
     val soundAfter : Int,
-    val soundFinish : Int
+    val soundFinish : Int,
+    val timeBeforePhotoSound: String
     )

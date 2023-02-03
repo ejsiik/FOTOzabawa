@@ -65,6 +65,7 @@ class FotoFragment : Fragment() {
         var beforeSound: Int = 1
         var afterSound: Int = 2
         var endSound: Int = 3
+        var timeBeforePhoto: Long = 1000
 
         binding = FragmentFotoBinding.inflate(layoutInflater)
 
@@ -75,11 +76,14 @@ class FotoFragment : Fragment() {
 
         lifecycleScope.launch(Dispatchers.IO){
             val tmpModel = viewModel.getSettings()
-            maxPhotos = tmpModel.count
-            interval = tmpModel.time
-            beforeSound = tmpModel.soundBefore
-            afterSound = tmpModel.soundAfter
-            endSound = tmpModel.soundFinish
+            tmpModel?.let {
+                maxPhotos = it.count.toInt()
+                interval = it.time.toLong()*1000
+                beforeSound = it.soundBefore
+                afterSound = it.soundAfter
+                endSound = it.soundFinish
+                timeBeforePhoto = it.timeBeforePhotoSound.toLong() * 1000
+            }
         }
         /*val maxPhotos = viewModel.getSettings().value?.count
         val interval: Long? = viewModel.getSettings().value?.time
@@ -106,7 +110,7 @@ class FotoFragment : Fragment() {
                     soundManager.playBeforePictureSound(beforeSound)
                     handler.postDelayed({
                         takePhoto()
-                    }, 2000) // to be configured
+                    }, timeBeforePhoto) // to be configured
                     counter++
                     try {
                         soundManager.playAfterPictureSound(afterSound)
@@ -119,7 +123,11 @@ class FotoFragment : Fragment() {
                 if (counter < maxPhotos) {
                         handler.postDelayed({
                             view.btnTakePhoto.performClick()
-                        }, interval?.minus(2000) ?: 5000) // to be configured
+                        }, if(interval-timeBeforePhoto>0){
+                            interval-timeBeforePhoto
+                        } else{
+                            900
+                        })
                 } else {
                     counter = 0
                     handler.postDelayed({
@@ -131,53 +139,12 @@ class FotoFragment : Fragment() {
                     }, 1000)
                 }
             }
-
-            /*var handler = Handler()
-            if (counter < maxPhotos!!) {
-                try { // play the sound
-                    playTune()
-                    handler.postDelayed({
-                        takePhoto()
-                    }, intervalBP)
-                    counter++
-                    try {
-                        handler.postDelayed({
-                            playCustomTune()
-                        }, intervalAP)
-                    } catch (e: java.lang.Exception) {
-                        e.printStackTrace()
-                    }
-                } catch (e: java.lang.Exception) {
-                    e.printStackTrace()
-                }
-                /*if (counter < maxPhotos) {
-                    handler.postDelayed({
-                        view.btnTakePhoto.performClick()
-                    }, lastInterval)
-                } else {
-                    counter = 0
-                    handler.postDelayed({
-                        playCustomTune()
-                    }, intervalASP)
-                }*/
-            }*/
         }
         view.btnMenu.setOnClickListener {
             openMenu()
         }
         return view
     }
-    /*private fun playTune() { // default notify ringtone
-        val notification =
-            RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val sound = RingtoneManager.getRingtone(context, notification)
-        sound.play()
-    }
-
-    private fun playCustomTune() { // custom
-        val track: MediaPlayer? = MediaPlayer.create(context, R.raw.notify1)
-        track?.start()
-    }*/
 
 
     override fun onRequestPermissionsResult(
