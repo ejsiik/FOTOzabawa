@@ -18,15 +18,12 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.databinding.FragmentFotoBinding
 import com.example.fotozabawa.model.SoundManager
-import com.example.fotozabawa.model.entity.Model
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
 import kotlinx.coroutines.Dispatchers
@@ -68,9 +65,7 @@ class FotoFragment : Fragment() {
         var timeBeforePhoto: Long = 1000
 
         binding = FragmentFotoBinding.inflate(layoutInflater)
-
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
-        //val viewModel = ViewModelProviders.of(this).get(SettingsViewModel::class.java)
 
         var counter = 0
 
@@ -85,11 +80,6 @@ class FotoFragment : Fragment() {
                 timeBeforePhoto = it.timeBeforePhotoSound.toLong() * 1000
             }
         }
-        /*val maxPhotos = viewModel.getSettings().value?.count
-        val interval: Long? = viewModel.getSettings().value?.time
-        val beforeSound = viewModel.getSettings().value?.soundBefore
-        val afterSound = viewModel.getSettings().value?.soundAfter
-        val endSound = viewModel.getSettings().value?.soundFinish*/
 
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -110,7 +100,11 @@ class FotoFragment : Fragment() {
                     soundManager.playBeforePictureSound(beforeSound)
                     handler.postDelayed({
                         takePhoto()
-                    }, timeBeforePhoto) // to be configured
+                    }, if(interval-timeBeforePhoto>0){
+                        interval-timeBeforePhoto
+                    } else{
+                        900
+                    })
                     counter++
                     try {
                         soundManager.playAfterPictureSound(afterSound)
@@ -152,7 +146,6 @@ class FotoFragment : Fragment() {
         permissions: Array<String>,
         grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
 
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if(allPermissionGranted()) {

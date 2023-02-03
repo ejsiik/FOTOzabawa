@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import android.widget.Toast
@@ -13,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.model.entity.Model
-import com.example.fotozabawa.model.repository.ModelRepository
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_settings.view.*
 
@@ -25,8 +23,6 @@ class SettingsFragment : Fragment() {
     private lateinit var spinneraPS: Spinner
     private lateinit var spinneraSPS: Spinner
     private lateinit var spinnerTBS: Spinner
-
-    private lateinit var modelRepository: ModelRepository
     private lateinit var viewModel: SettingsViewModel
 
     override fun onCreateView(
