@@ -3,6 +3,7 @@ package com.example.fotozabawa.view
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -92,7 +93,9 @@ class FotoFragment : Fragment() {
                 REQUIRED_PERMISSIONS,
                 REQUEST_CODE_PERMISSIONS
             )
+            startCamera()
         }
+
         view.btnTakePhoto.setOnClickListener {
             val handler = Handler()
             if (counter < maxPhotos) {
@@ -170,9 +173,6 @@ class FotoFragment : Fragment() {
     }
 
     private fun openMenu() {
-        Toast.makeText(requireContext(),
-            "Open menu",
-            Toast.LENGTH_SHORT).show()
         findNavController().navigate(R.id.action_fotoFragment_to_settingsFragment)
     }
 
@@ -197,10 +197,10 @@ class FotoFragment : Fragment() {
                     val savedUri = Uri.fromFile(photoFile)
                     val msg = "Photo Saved"
 
-                    Toast.makeText(requireContext(),
+                    /*Toast.makeText(requireContext(),
                         "$msg $savedUri",
                         Toast.LENGTH_SHORT
-                    ).show()
+                    ).show()*/
                 }
 
                 override fun onError(exception: ImageCaptureException) {
