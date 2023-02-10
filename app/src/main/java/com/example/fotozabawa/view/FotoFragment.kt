@@ -58,12 +58,16 @@ class FotoFragment : Fragment() {
     private lateinit var apiCall: RetroService
     private lateinit var currentPhotos: ArrayList<String>
 
+    lateinit var fileName: String
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_foto, container, false)
         soundManager = SoundManager(requireContext())
+
+        fileName = ""
 
         var maxPhotos: Int = 2
         var interval: Long = 5000
@@ -76,6 +80,8 @@ class FotoFragment : Fragment() {
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
 
         apiCall = RetroInstance.getRetroInstance().create(RetroService::class.java)
+
+
 
         var counter = 0
 
@@ -107,7 +113,17 @@ class FotoFragment : Fragment() {
             startCamera()
         }
 
+        val photoFile = File( outputDirectory, fileName)
+
         view.btnTakePhoto.setOnClickListener {
+
+            fileName = SimpleDateFormat(
+                FILE_NAME_FORMAT,
+                Locale.getDefault())
+                .format(System
+                    .currentTimeMillis()) + ".jpg"
+
+
             val handler = Handler()
             if (counter < maxPhotos) {
                 try { // play the sound
@@ -122,6 +138,7 @@ class FotoFragment : Fragment() {
                     counter++
                     try {
                         soundManager.playAfterPictureSound(afterSound)
+                        sendPhotoToServer(photoFile, fileName)
                     } catch (e: java.lang.Exception) {
                         e.printStackTrace()
                     }
@@ -137,7 +154,7 @@ class FotoFragment : Fragment() {
                             900
                         })
                 } else {
-                    requestCombinePhotos("baner")
+                    //requestCombinePhotos("baner")
                     counter = 0
                     handler.postDelayed({
                         try {
@@ -190,20 +207,15 @@ class FotoFragment : Fragment() {
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
 
-        val fileName = SimpleDateFormat(
-            FILE_NAME_FORMAT,
-            Locale.getDefault())
-            .format(System
-                .currentTimeMillis()) + ".jpg"
-
         val photoFile = File( outputDirectory, fileName)
 
-        val outputOption = ImageCapture
+        /*val outputOption = ImageCapture
             .OutputFileOptions
             .Builder(photoFile)
-            .build()
+            .build()*/
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        imageCapture.takePicture(
+        /*imageCapture.takePicture(
             outputOption, ContextCompat.getMainExecutor(requireContext()),
             object :ImageCapture.OnImageSavedCallback{
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
@@ -220,16 +232,29 @@ class FotoFragment : Fragment() {
                     Log.e(TAG, "onError: ${exception.message}",exception)
                 }
             }
-        )
+        )*/
+        imageCapture?.takePicture(
+            outputOptions,
+            cameraExecutor,
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onError(exc: ImageCaptureException) {
+                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                }
 
-        sendPhotoToServer(photoFile, fileName)
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
+                    Log.d(TAG, "Photo capture succeeded: $savedUri")
+
+                }
+            })
+
+        //sendPhotoToServer(photoFile, fileName)
     }
 
     private fun sendPhotoToServer(photoFile: File, fileName: String) {
         currentPhotos.add(fileName)
 
         val fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(photoFile)
-
         val photoString = Base64.getEncoder().encodeToString(fileContent)
 
         val photoReq = SavePhotoReq(PhotoEntity(photoString, fileName))
