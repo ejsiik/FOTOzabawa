@@ -3,7 +3,6 @@ package com.example.fotozabawa.view
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -25,16 +24,21 @@ import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.databinding.FragmentFotoBinding
 import com.example.fotozabawa.model.SoundManager
+import com.example.fotozabawa.model.entity.PhotoEntity
+import com.example.fotozabawa.network.*
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
 
 class FotoFragment : Fragment() {
 
@@ -50,6 +54,9 @@ class FotoFragment : Fragment() {
     private lateinit var mediaPlayer: MediaPlayer
     private lateinit var viewModel: SettingsViewModel
     private lateinit var soundManager: SoundManager
+
+    private lateinit var apiCall: RetroService
+    private lateinit var currentPhotos: ArrayList<String>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,6 +75,8 @@ class FotoFragment : Fragment() {
         binding = FragmentFotoBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
 
+        apiCall = RetroInstance.getRetroInstance().create(RetroService::class.java)
+
         var counter = 0
 
         lifecycleScope.launch(Dispatchers.IO){
@@ -84,6 +93,8 @@ class FotoFragment : Fragment() {
 
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        currentPhotos = ArrayList(maxPhotos)
 
         if (allPermissionGranted()) {
             startCamera()
@@ -126,6 +137,7 @@ class FotoFragment : Fragment() {
                             900
                         })
                 } else {
+                    requestCombinePhotos("baner")
                     counter = 0
                     handler.postDelayed({
                         try {
@@ -142,7 +154,6 @@ class FotoFragment : Fragment() {
         }
         return view
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -178,12 +189,14 @@ class FotoFragment : Fragment() {
 
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
-        val photoFile = File( outputDirectory,
-            SimpleDateFormat(
-                FILE_NAME_FORMAT,
-                Locale.getDefault())
-                .format(System
-                    .currentTimeMillis()) + ".jpg")
+
+        val fileName = SimpleDateFormat(
+            FILE_NAME_FORMAT,
+            Locale.getDefault())
+            .format(System
+                .currentTimeMillis()) + ".jpg"
+
+        val photoFile = File( outputDirectory, fileName)
 
         val outputOption = ImageCapture
             .OutputFileOptions
@@ -208,6 +221,56 @@ class FotoFragment : Fragment() {
                 }
             }
         )
+
+        sendPhotoToServer(photoFile, fileName)
+    }
+
+    private fun sendPhotoToServer(photoFile: File, fileName: String) {
+        currentPhotos.add(fileName)
+
+        val fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(photoFile)
+
+        val photoString = Base64.getEncoder().encodeToString(fileContent)
+
+        val photoReq = SavePhotoReq(PhotoEntity(photoString, fileName))
+
+        GlobalScope.launch {
+            val result = apiCall.postSavePhotoOnServer(photoReq)
+
+            result.enqueue(object : Callback<Void> {
+
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    Toast.makeText(context, "Data added to API", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Toast.makeText(context, "Cant add to API", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
+
+
+    }
+
+    private fun requestCombinePhotos(baner : String) {
+        val combineReq = CombinePhotoReq(currentPhotos, baner)
+
+        GlobalScope.launch {
+            val result = apiCall.postCombinePhotos(combineReq)
+
+            result.enqueue(object : Callback<CombinePhotoRsp> {
+                override fun onResponse(
+                    call: Call<CombinePhotoRsp>,
+                    response: Response<CombinePhotoRsp>
+                ) {
+                    Toast.makeText(context, "Data added to API", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onFailure(call: Call<CombinePhotoRsp>, t: Throwable) {
+                    Toast.makeText(context, "Cant add to API", Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
     }
 
     private fun startCamera() {
