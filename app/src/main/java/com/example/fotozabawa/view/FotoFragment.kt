@@ -28,6 +28,7 @@ import com.example.fotozabawa.model.entity.PhotoEntity
 import com.example.fotozabawa.network.*
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -113,10 +114,8 @@ class FotoFragment : Fragment() {
             startCamera()
         }
 
-        val photoFile = File( outputDirectory, fileName)
-
         view.btnTakePhoto.setOnClickListener {
-
+            val photoFile = File( outputDirectory, fileName)
             fileName = SimpleDateFormat(
                 FILE_NAME_FORMAT,
                 Locale.getDefault())
@@ -138,13 +137,14 @@ class FotoFragment : Fragment() {
                     counter++
                     try {
                         soundManager.playAfterPictureSound(afterSound)
-                        sendPhotoToServer(photoFile, fileName)
+
                     } catch (e: java.lang.Exception) {
                         e.printStackTrace()
                     }
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                 }
+                //sendPhotoToServer(photoFile, fileName)
                 if (counter < maxPhotos) {
                         handler.postDelayed({
                             view.btnTakePhoto.performClick()
@@ -154,7 +154,7 @@ class FotoFragment : Fragment() {
                             900
                         })
                 } else {
-                    //requestCombinePhotos("baner")
+                    requestCombinePhotos("baner")
                     counter = 0
                     handler.postDelayed({
                         try {
@@ -244,44 +244,46 @@ class FotoFragment : Fragment() {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
                     Log.d(TAG, "Photo capture succeeded: $savedUri")
-
+                    try{
+                        sendPhotoToServer(photoFile, fileName)
+                    } catch (e : java.lang.Exception){
+                        Log.e(TAG, "HTTP 500!")
+                    }
                 }
             })
-
-        //sendPhotoToServer(photoFile, fileName)
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun sendPhotoToServer(photoFile: File, fileName: String) {
         currentPhotos.add(fileName)
 
-        val fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(photoFile)
+        Log.d("henlo", photoFile.path + "/" + fileName)
+
+        val fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(File(photoFile.path))
         val photoString = Base64.getEncoder().encodeToString(fileContent)
 
         val photoReq = SavePhotoReq(PhotoEntity(photoString, fileName))
 
-        GlobalScope.launch {
-            val result = apiCall.postSavePhotoOnServer(photoReq)
+        val result = apiCall.postSavePhotoOnServer(photoReq)
 
-            result.enqueue(object : Callback<Void> {
+            result.enqueue(object : Callback<Unit> {
 
-                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
                     Toast.makeText(context, "Data added to API", Toast.LENGTH_SHORT).show()
                 }
 
-                override fun onFailure(call: Call<Void>, t: Throwable) {
+                override fun onFailure(call: Call<Unit>, t: Throwable) {
                     Toast.makeText(context, "Cant add to API", Toast.LENGTH_SHORT).show()
                 }
             })
-        }
-
 
     }
 
     private fun requestCombinePhotos(baner : String) {
         val combineReq = CombinePhotoReq(currentPhotos, baner)
 
-        GlobalScope.launch {
-            val result = apiCall.postCombinePhotos(combineReq)
+
+        val result = apiCall.postCombinePhotos(combineReq)
 
             result.enqueue(object : Callback<CombinePhotoRsp> {
                 override fun onResponse(
@@ -295,7 +297,7 @@ class FotoFragment : Fragment() {
                     Toast.makeText(context, "Cant add to API", Toast.LENGTH_SHORT).show()
                 }
             })
-        }
+
     }
 
     private fun startCamera() {
