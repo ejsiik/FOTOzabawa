@@ -4,7 +4,9 @@ import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
+import android.util.Base64.decode
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -28,18 +30,20 @@ import com.example.fotozabawa.model.entity.PhotoEntity
 import com.example.fotozabawa.network.*
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import kotlin.collections.ArrayList
 
 class FotoFragment : Fragment() {
 
@@ -61,6 +65,8 @@ class FotoFragment : Fragment() {
 
     lateinit var fileName: String
 
+    private var isDone = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -68,7 +74,6 @@ class FotoFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_foto, container, false)
         soundManager = SoundManager(requireContext())
 
-        fileName = ""
 
         var maxPhotos: Int = 2
         var interval: Long = 5000
@@ -103,6 +108,8 @@ class FotoFragment : Fragment() {
 
         currentPhotos = ArrayList(maxPhotos)
 
+        fileName = ""
+
         if (allPermissionGranted()) {
             startCamera()
         } else {
@@ -115,47 +122,52 @@ class FotoFragment : Fragment() {
         }
 
         view.btnTakePhoto.setOnClickListener {
-            val photoFile = File( outputDirectory, fileName)
-            fileName = SimpleDateFormat(
-                FILE_NAME_FORMAT,
-                Locale.getDefault())
-                .format(System
-                    .currentTimeMillis()) + ".jpg"
-
 
             val handler = Handler()
             if (counter < maxPhotos) {
-                try { // play the sound
+                Log.w(TAG, "Nadpisuje name: " + fileName)
+                fileName = SimpleDateFormat(
+                    FILE_NAME_FORMAT,
+                    Locale.getDefault())
+                    .format(System
+                        .currentTimeMillis()) + ".jpg"
+
+                try {
                     soundManager.playBeforePictureSound(beforeSound)
+                } catch (e: java.lang.Exception) {
+                    e.printStackTrace()
+                }
+
+                handler.postDelayed({
+                    synchronized(this){
+                        takePhoto(counter)
+                    }
+                    try {
+                        soundManager.playAfterPictureSound(afterSound)
+                    } catch (e: java.lang.Exception) {
+                        e.printStackTrace()
+                    }
+                }, if(interval-timeBeforePhoto>0){
+                    interval-timeBeforePhoto
+                } else{
+                    900
+                })
+
+                counter++
+
+                if (counter < maxPhotos) {
                     handler.postDelayed({
-                        takePhoto()
+                        view.btnTakePhoto.performClick()
                     }, if(interval-timeBeforePhoto>0){
                         interval-timeBeforePhoto
                     } else{
                         900
                     })
-                    counter++
-                    try {
-                        soundManager.playAfterPictureSound(afterSound)
-
-                    } catch (e: java.lang.Exception) {
-                        e.printStackTrace()
-                    }
-                } catch (e: java.lang.Exception) {
-                    e.printStackTrace()
-                }
-                //sendPhotoToServer(photoFile, fileName)
-                if (counter < maxPhotos) {
-                        handler.postDelayed({
-                            view.btnTakePhoto.performClick()
-                        }, if(interval-timeBeforePhoto>0){
-                            interval-timeBeforePhoto
-                        } else{
-                            900
-                        })
                 } else {
-                    requestCombinePhotos("baner")
                     counter = 0
+                    synchronized(this){
+                        isDone = true
+                    }
                     handler.postDelayed({
                         try {
                             soundManager.playEndSeriesSound(endSound!!)
@@ -165,6 +177,7 @@ class FotoFragment : Fragment() {
                     }, 1000)
                 }
             }
+
         }
         view.btnMenu.setOnClickListener {
             openMenu()
@@ -204,35 +217,13 @@ class FotoFragment : Fragment() {
         findNavController().navigate(R.id.action_fotoFragment_to_settingsFragment)
     }
 
-    private fun takePhoto() {
+    private fun takePhoto(index: Int) {
         val imageCapture = imageCapture ?: return
 
         val photoFile = File( outputDirectory, fileName)
 
-        /*val outputOption = ImageCapture
-            .OutputFileOptions
-            .Builder(photoFile)
-            .build()*/
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        /*imageCapture.takePicture(
-            outputOption, ContextCompat.getMainExecutor(requireContext()),
-            object :ImageCapture.OnImageSavedCallback{
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo Saved"
-
-                    /*Toast.makeText(requireContext(),
-                        "$msg $savedUri",
-                        Toast.LENGTH_SHORT
-                    ).show()*/
-                }
-
-                override fun onError(exception: ImageCaptureException) {
-                    Log.e(TAG, "onError: ${exception.message}",exception)
-                }
-            }
-        )*/
         imageCapture?.takePicture(
             outputOptions,
             cameraExecutor,
@@ -243,60 +234,94 @@ class FotoFragment : Fragment() {
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = output.savedUri ?: Uri.fromFile(photoFile)
+                    val fileName2 = savedUri.path?.substring((savedUri.path?.length?.minus(25)!!))
                     Log.d(TAG, "Photo capture succeeded: $savedUri")
                     try{
-                        sendPhotoToServer(photoFile, fileName)
+                        savedUri.path?.let {
+                            if (fileName2 != null) {
+                                sendPhotoToServer(it, fileName2)
+                            }
+                        }
                     } catch (e : java.lang.Exception){
                         Log.e(TAG, "HTTP 500!")
                     }
                 }
             })
+
+        if(isDone){
+            requestCombinePhotos(1)
+            currentPhotos.clear()
+        }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
-    private fun sendPhotoToServer(photoFile: File, fileName: String) {
+    private fun sendPhotoToServer(uri : String, fileName: String) {
         currentPhotos.add(fileName)
 
-        Log.d("henlo", photoFile.path + "/" + fileName)
+        val fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(File(uri))
 
-        val fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(File(photoFile.path))
         val photoString = Base64.getEncoder().encodeToString(fileContent)
 
         val photoReq = SavePhotoReq(PhotoEntity(photoString, fileName))
 
         val result = apiCall.postSavePhotoOnServer(photoReq)
 
-            result.enqueue(object : Callback<Unit> {
+        result.enqueue(object : Callback<Unit> {
 
-                override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
-                    Toast.makeText(context, "Data added to API", Toast.LENGTH_SHORT).show()
-                }
+            override fun onResponse(call: Call<Unit>, response: Response<Unit>) {
+                Log.d(TAG, "Succes saved!")
+            }
 
-                override fun onFailure(call: Call<Unit>, t: Throwable) {
-                    Toast.makeText(context, "Cant add to API", Toast.LENGTH_SHORT).show()
-                }
-            })
+            override fun onFailure(call: Call<Unit>, t: Throwable) {
+                Log.e(TAG, "Save went wrong!")
+            }
+        })
 
     }
 
-    private fun requestCombinePhotos(baner : String) {
+    private fun requestCombinePhotos(baner : Int) {
         val combineReq = CombinePhotoReq(currentPhotos, baner)
-
 
         val result = apiCall.postCombinePhotos(combineReq)
 
-            result.enqueue(object : Callback<CombinePhotoRsp> {
-                override fun onResponse(
-                    call: Call<CombinePhotoRsp>,
-                    response: Response<CombinePhotoRsp>
-                ) {
-                    Toast.makeText(context, "Data added to API", Toast.LENGTH_SHORT).show()
-                }
+        result.enqueue(object : Callback<CombinePhotoRsp> {
+            override fun onResponse(
+                call: Call<CombinePhotoRsp>,
+                response: Response<CombinePhotoRsp>
+            ) {
+                if (response.isSuccessful) {
+                    val combinePhotoResponse = response.body()
+                    if (combinePhotoResponse != null) {
+                        val base64EncodedPDF = combinePhotoResponse.combinedPhoto
+                        if (!base64EncodedPDF.isNullOrBlank()) {
+                            val pdfBytes = Base64.getDecoder().decode(base64EncodedPDF)
+                            val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                            val file = File(downloadDir, fileName.substring(0, fileName.length-4))
 
-                override fun onFailure(call: Call<CombinePhotoRsp>, t: Throwable) {
-                    Toast.makeText(context, "Cant add to API", Toast.LENGTH_SHORT).show()
+                            var outputStream: OutputStream? = null
+                            try {
+                                outputStream = FileOutputStream(file)
+                                outputStream.write(pdfBytes)
+                            } catch (e: IOException) {
+                                // handle error
+                            } finally {
+                                outputStream?.close()
+                            }
+                            Toast.makeText(context, "PDF file saved in downloads folder", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
                 }
-            })
+            }
+
+            override fun onFailure(call: Call<CombinePhotoRsp>, t: Throwable) {
+                Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
+            }
+        })
 
     }
 
@@ -336,3 +361,4 @@ class FotoFragment : Fragment() {
     }
 
 }
+
