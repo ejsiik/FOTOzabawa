@@ -122,7 +122,7 @@ class FotoFragment : Fragment() {
         }
 
         view.btnTakePhoto.setOnClickListener {
-
+            it.isEnabled = false
             val handler = Handler()
             if (counter < maxPhotos) {
                 Log.w(TAG, "Nadpisuje name: " + fileName)
@@ -131,7 +131,7 @@ class FotoFragment : Fragment() {
                     Locale.getDefault())
                     .format(System
                         .currentTimeMillis()) + ".jpg"
-
+                currentPhotos.add(fileName)
                 try {
                     soundManager.playBeforePictureSound(beforeSound)
                 } catch (e: java.lang.Exception) {
@@ -139,9 +139,7 @@ class FotoFragment : Fragment() {
                 }
 
                 handler.postDelayed({
-                    synchronized(this){
-                        takePhoto(counter)
-                    }
+                    takePhoto()
                     try {
                         soundManager.playAfterPictureSound(afterSound)
                     } catch (e: java.lang.Exception) {
@@ -165,15 +163,16 @@ class FotoFragment : Fragment() {
                     })
                 } else {
                     counter = 0
-                    synchronized(this){
-                        isDone = true
-                    }
+
+                    isDone = true
+
                     handler.postDelayed({
                         try {
                             soundManager.playEndSeriesSound(endSound!!)
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
+                        it.isEnabled = true
                     }, 1000)
                 }
             }
@@ -217,7 +216,7 @@ class FotoFragment : Fragment() {
         findNavController().navigate(R.id.action_fotoFragment_to_settingsFragment)
     }
 
-    private fun takePhoto(index: Int) {
+    private fun takePhoto() {
         val imageCapture = imageCapture ?: return
 
         val photoFile = File( outputDirectory, fileName)
@@ -249,13 +248,15 @@ class FotoFragment : Fragment() {
             })
 
         if(isDone){
-            requestCombinePhotos(1)
+            val handler = Handler()
+            handler.postDelayed({
+                requestCombinePhotos(1)
+            }, 5000)
             currentPhotos.clear()
         }
     }
 
     private fun sendPhotoToServer(uri : String, fileName: String) {
-        currentPhotos.add(fileName)
 
         val fileContent = org.apache.commons.io.FileUtils.readFileToByteArray(File(uri))
 
@@ -311,18 +312,16 @@ class FotoFragment : Fragment() {
                             Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
+                        Log.d(TAG, "Failed to download PDF file - rsp is null")
                     }
                 } else {
-                    Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, "Failed to download PDF file - rsp in not gut")
                 }
             }
-
             override fun onFailure(call: Call<CombinePhotoRsp>, t: Throwable) {
-                Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "onFailure - Failed to download PDF file")
             }
         })
-
     }
 
     private fun startCamera() {
