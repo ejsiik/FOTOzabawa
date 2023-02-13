@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
+import android.os.SystemClock
 import android.util.Base64.decode
 import android.util.Log
 import android.view.LayoutInflater
@@ -81,6 +82,7 @@ class FotoFragment : Fragment() {
         var afterSound: Int = 2
         var endSound: Int = 3
         var timeBeforePhoto: Long = 1000
+        var lastClickTime: Long = 0
 
         binding = FragmentFotoBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
@@ -122,6 +124,12 @@ class FotoFragment : Fragment() {
         }
 
         view.btnTakePhoto.setOnClickListener {
+            // mis-clicking prevention, using threshold of 800 ms
+            if (SystemClock.elapsedRealtime() - lastClickTime < 800){
+                return@setOnClickListener;
+            }
+            lastClickTime = SystemClock.elapsedRealtime();
+
             it.isEnabled = false
             val handler = Handler()
             if (counter < maxPhotos) {
