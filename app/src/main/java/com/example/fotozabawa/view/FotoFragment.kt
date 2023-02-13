@@ -1,6 +1,9 @@
 package com.example.fotozabawa.view
 
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -248,7 +251,8 @@ class FotoFragment : Fragment() {
                     try{
                         savedUri.path?.let {
                             if (fileName2 != null) {
-                                sendPhotoToServer(it, fileName2)
+                                //sendPhotoToServer(it, fileName2)
+                                rotateAndSendPhoto(it, fileName2)
                             }
                         }
                     } catch (e : java.lang.Exception){
@@ -264,6 +268,17 @@ class FotoFragment : Fragment() {
             }, 5000)
             currentPhotos.clear()
         }
+    }
+
+    private fun rotateAndSendPhoto(photoPath: String, fileName: String) {
+        val bitmap = BitmapFactory.decodeFile(photoPath)
+        val matrix = Matrix().apply { setRotate(90f) }
+        val rotatedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        val rotatedFile = File(outputDirectory, "rotated_$fileName")
+        val fos = FileOutputStream(rotatedFile)
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos)
+        fos.close()
+        sendPhotoToServer(rotatedFile.path, fileName)
     }
 
     private fun sendPhotoToServer(uri : String, fileName: String) {
