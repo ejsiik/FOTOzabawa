@@ -7,7 +7,7 @@ import com.example.fotozabawa.model.entity.Model
 
 
 @Database(
-    entities = [Model::class], version = 4, exportSchema = false
+    entities = [Model::class], version = 5, exportSchema = false
 )
 abstract class FotoDatabase : RoomDatabase(){
 

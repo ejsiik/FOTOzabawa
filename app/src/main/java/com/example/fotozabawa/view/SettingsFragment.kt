@@ -26,6 +26,8 @@ class SettingsFragment : Fragment() {
     private lateinit var spinneraPS: Spinner
     private lateinit var spinneraSPS: Spinner
     private lateinit var spinnerTBS: Spinner
+    private lateinit var spinnerBaner: Spinner
+    private lateinit var spinnerFilter: Spinner
     private lateinit var viewModel: SettingsViewModel
 
     override fun onCreateView(
@@ -42,6 +44,9 @@ class SettingsFragment : Fragment() {
         afterPhotoSound(view)
         afterSeriesSound(view)
         timeBeforePhotoSoundSpinner(view)
+        banerSpinner(view)
+        filterSpinner(view)
+
 
         view.btnConfirm.setOnClickListener{
             val time = spinnerT.selectedItem.toString()
@@ -50,8 +55,10 @@ class SettingsFragment : Fragment() {
             val aps = spinneraPS.selectedItemId.toInt()
             val asps = spinneraSPS.selectedItemId.toInt()
             val tbps = spinnerTBS.selectedItem.toString()
+            val baner = spinnerBaner.selectedItemId.toInt()
+            val filter = spinnerFilter.selectedItemId.toInt()
 
-            val model = Model (0, time, amount, bps, aps, asps, tbps)
+            val model = Model (0, time, amount, bps, aps, asps, tbps, baner, filter)
             viewModel.addSettings(model)
             Toast.makeText(requireContext(), "Zmieniono ustawienia", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_settingsFragment_to_fotoFragment)
@@ -198,6 +205,54 @@ class SettingsFragment : Fragment() {
                         val actualIndex = it.timeBeforePhotoSound
                         val storedValueIndex = adapter.getPosition(actualIndex)
                         spinnerTBS.setSelection(storedValueIndex)
+                    }
+                }
+            }
+        }
+    }
+
+    fun banerSpinner(view: View) {
+        spinnerBaner = view.spinnerBaner
+        context?.let {
+            ArrayAdapter.createFromResource(
+                it,
+                R.array.sound_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                spinnerBaner.adapter = adapter
+                lifecycleScope.launch(Dispatchers.IO){
+                    val tmpModel = viewModel.getSettings()
+                    tmpModel?.let {
+                        val actualIndex = (it.baner + 1).toString()
+                        val storedValueIndex = adapter.getPosition(actualIndex)
+                        spinnerBaner.setSelection(storedValueIndex)
+                    }
+                }
+            }
+        }
+    }
+
+    fun filterSpinner(view: View) {
+        spinnerFilter = view.spinnerFilter
+        context?.let {
+            ArrayAdapter.createFromResource(
+                it,
+                R.array.sound_array,
+                android.R.layout.simple_spinner_item
+            ).also { adapter ->
+                // Specify the layout to use when the list of choices appears
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                spinnerFilter.adapter = adapter
+                lifecycleScope.launch(Dispatchers.IO){
+                    val tmpModel = viewModel.getSettings()
+                    tmpModel?.let {
+                        val actualIndex = (it.filter + 1).toString()
+                        val storedValueIndex = adapter.getPosition(actualIndex)
+                        spinnerFilter.setSelection(storedValueIndex)
                     }
                 }
             }

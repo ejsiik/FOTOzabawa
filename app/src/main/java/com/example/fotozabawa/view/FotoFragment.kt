@@ -83,6 +83,8 @@ class FotoFragment : Fragment() {
         var endSound: Int = 3
         var timeBeforePhoto: Long = 1000
         var lastClickTime: Long = 0
+        var baner: Int = 1
+        var filter: Int = 1
 
         binding = FragmentFotoBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
@@ -102,6 +104,8 @@ class FotoFragment : Fragment() {
                 afterSound = it.soundAfter
                 endSound = it.soundFinish
                 timeBeforePhoto = it.timeBeforePhotoSound.toLong() * 1000
+                baner = it.baner
+                filter = it.filter
             }
         }
 
@@ -147,7 +151,7 @@ class FotoFragment : Fragment() {
                 }
 
                 handler.postDelayed({
-                    takePhoto()
+                    takePhoto(baner, filter)
                     try {
                         soundManager.playAfterPictureSound(afterSound)
                     } catch (e: java.lang.Exception) {
@@ -171,9 +175,7 @@ class FotoFragment : Fragment() {
                     })
                 } else {
                     counter = 0
-
                     isDone = true
-
                     handler.postDelayed({
                         try {
                             soundManager.playEndSeriesSound(endSound!!)
@@ -224,7 +226,7 @@ class FotoFragment : Fragment() {
         findNavController().navigate(R.id.action_fotoFragment_to_settingsFragment)
     }
 
-    private fun takePhoto() {
+    private fun takePhoto(baner: Int, filter: Int) {
         val imageCapture = imageCapture ?: return
 
         val photoFile = File( outputDirectory, fileName)
@@ -258,7 +260,7 @@ class FotoFragment : Fragment() {
         if(isDone){
             val handler = Handler()
             handler.postDelayed({
-                requestCombinePhotos(1)
+                requestCombinePhotos(baner)
             }, 5000)
             currentPhotos.clear()
         }

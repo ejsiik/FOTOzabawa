@@ -1,6 +1,5 @@
 package com.example.fotozabawa.model.repository
 
-import androidx.lifecycle.LiveData
 import com.example.fotozabawa.model.dao.ModelDao
 import com.example.fotozabawa.model.entity.Model
 
