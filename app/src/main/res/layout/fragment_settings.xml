@@ -173,6 +173,32 @@ app:layout_constraintHorizontal_bias="0.5"
 app:layout_constraintStart_toStartOf="parent"
 app:layout_constraintTop_toBottomOf="@+id/tvTimeBefore" />
 
+    <TextView
+        android:id="@+id/tvBaner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Baner"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinnerTimeBefore" />
+
+    <Spinner
+        android:id="@+id/spinnerBaner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:contentDescription="@string/app_name"
+        android:minHeight="36dp"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvBaner"
+        android:gravity="center"/>
+
 <Button
 android:id="@+id/btnConfirm"
 android:layout_width="wrap_content"
@@ -181,7 +207,7 @@ android:layout_marginTop="24dp"
 android:text="Confirm"
 app:layout_constraintEnd_toEndOf="parent"
 app:layout_constraintStart_toStartOf="parent"
-app:layout_constraintTop_toBottomOf="@+id/spinnerTimeBefore" />
+app:layout_constraintTop_toBottomOf="@+id/spinnerBaner" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

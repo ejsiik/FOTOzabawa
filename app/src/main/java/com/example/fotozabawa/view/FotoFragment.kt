@@ -181,7 +181,7 @@ class FotoFragment : Fragment() {
                             e.printStackTrace()
                         }
                         it.isEnabled = true
-                    }, 1000)
+                    }, 1500)
                 }
             }
 
