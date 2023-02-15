@@ -226,9 +226,8 @@ class SettingsFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
                     tmpModel?.let {
-                        val actualIndex = (it.baner + 1).toString()
-                        val storedValueIndex = adapter.getPosition(actualIndex)
-                        spinnerBaner.setSelection(storedValueIndex)
+                        val actualIndex = it.baner
+                        spinnerBaner.setSelection(actualIndex)
                     }
                 }
             }
@@ -250,9 +249,8 @@ class SettingsFragment : Fragment() {
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
                     tmpModel?.let {
-                        val actualIndex = (it.filter + 1).toString()
-                        val storedValueIndex = adapter.getPosition(actualIndex)
-                        spinnerFilter.setSelection(storedValueIndex)
+                        val actualIndex = it.filter
+                        spinnerFilter.setSelection(actualIndex)
                     }
                 }
             }

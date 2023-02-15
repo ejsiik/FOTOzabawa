@@ -6,10 +6,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.SystemClock
+import android.os.*
 import android.util.Base64.decode
 import android.util.Log
 import android.view.LayoutInflater
@@ -138,7 +135,7 @@ class FotoFragment : Fragment() {
             lastClickTime = SystemClock.elapsedRealtime();
 
             it.isEnabled = false
-            val handler = Handler()
+            val handler = Handler(Looper.getMainLooper())
             if (counter < maxPhotos) {
                 Log.w(TAG, "Nadpisuje name: " + fileName)
                 fileName = SimpleDateFormat(
@@ -161,9 +158,9 @@ class FotoFragment : Fragment() {
                         e.printStackTrace()
                     }
                 }, if(interval-timeBeforePhoto>0){
-                    interval-timeBeforePhoto
+                    timeBeforePhoto
                 } else{
-                    900
+                    1000
                 })
 
                 counter++
@@ -174,7 +171,7 @@ class FotoFragment : Fragment() {
                     }, if(interval-timeBeforePhoto>0){
                         interval-timeBeforePhoto
                     } else{
-                        900
+                        1000
                     })
                 } else {
                     counter = 0
