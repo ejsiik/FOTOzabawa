@@ -81,7 +81,7 @@ class SettingsFragment : Fragment() {
                 spinnerT.adapter = adapter
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
-                    tmpModel?.let {
+                    tmpModel.let {
                         val actualIndex = it.time
                         val storedValueIndex = adapter.getPosition(actualIndex)
                         spinnerT.setSelection(storedValueIndex)
@@ -105,7 +105,7 @@ class SettingsFragment : Fragment() {
                 spinnerA.adapter = adapter
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
-                    tmpModel?.let {
+                    tmpModel.let {
                         val actualIndex = it.count
                         val storedValueIndex = adapter.getPosition(actualIndex)
                         spinnerA.setSelection(storedValueIndex)
@@ -129,7 +129,7 @@ class SettingsFragment : Fragment() {
                 spinnerbPS.adapter = adapter
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
-                    tmpModel?.let {
+                    tmpModel.let {
                         val actualIndex = (it.soundBefore + 1).toString()
                         val storedValueIndex = adapter.getPosition(actualIndex)
                         spinnerbPS.setSelection(storedValueIndex)
@@ -153,7 +153,7 @@ class SettingsFragment : Fragment() {
                 spinneraPS.adapter = adapter
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
-                    tmpModel?.let {
+                    tmpModel.let {
                         val actualIndex = (it.soundAfter + 1).toString()
                         val storedValueIndex = adapter.getPosition(actualIndex)
                         spinneraPS.setSelection(storedValueIndex)
@@ -177,7 +177,7 @@ class SettingsFragment : Fragment() {
                 spinneraSPS.adapter = adapter
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
-                    tmpModel?.let {
+                    tmpModel.let {
                         val actualIndex = (it.soundFinish + 1).toString()
                         val storedValueIndex = adapter.getPosition(actualIndex)
                         spinneraSPS.setSelection(storedValueIndex)
@@ -201,7 +201,7 @@ class SettingsFragment : Fragment() {
                 spinnerTBS.adapter = adapter
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
-                    tmpModel?.let {
+                    tmpModel.let {
                         val actualIndex = it.timeBeforePhotoSound
                         val storedValueIndex = adapter.getPosition(actualIndex)
                         spinnerTBS.setSelection(storedValueIndex)
@@ -225,7 +225,7 @@ class SettingsFragment : Fragment() {
                 spinnerBaner.adapter = adapter
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
-                    tmpModel?.let {
+                    tmpModel.let {
                         val actualIndex = it.baner
                         spinnerBaner.setSelection(actualIndex)
                     }
@@ -248,7 +248,7 @@ class SettingsFragment : Fragment() {
                 spinnerFilter.adapter = adapter
                 lifecycleScope.launch(Dispatchers.IO){
                     val tmpModel = viewModel.getSettings()
-                    tmpModel?.let {
+                    tmpModel.let {
                         val actualIndex = it.filter
                         spinnerFilter.setSelection(actualIndex)
                     }

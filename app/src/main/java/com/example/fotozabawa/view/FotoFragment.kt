@@ -31,7 +31,9 @@ import com.example.fotozabawa.model.entity.PhotoEntity
 import com.example.fotozabawa.network.*
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -135,7 +137,7 @@ class FotoFragment : Fragment() {
             lastClickTime = SystemClock.elapsedRealtime();
 
             it.isEnabled = false
-            val handler = Handler(Looper.getMainLooper())
+            //val handler = Handler(Looper.getMainLooper())
             if (counter < maxPhotos) {
                 Log.w(TAG, "Nadpisuje name: " + fileName)
                 fileName = SimpleDateFormat(
@@ -150,7 +152,7 @@ class FotoFragment : Fragment() {
                     e.printStackTrace()
                 }
 
-                handler.postDelayed({
+                /*handler.postDelayed({
                     takePhoto(baner, filter)
                     try {
                         soundManager.playAfterPictureSound(afterSound)
@@ -161,29 +163,62 @@ class FotoFragment : Fragment() {
                     timeBeforePhoto
                 } else{
                     1000
-                })
+                })*/
+                val scope = CoroutineScope(Dispatchers.Main)
+                scope.launch {
+                    delay(if(interval-timeBeforePhoto>0){
+                        timeBeforePhoto
+                    } else{
+                        1000
+                    })
+                    takePhoto(baner, filter)
+                    try {
+                        soundManager.playAfterPictureSound(afterSound)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
 
                 counter++
 
                 if (counter < maxPhotos) {
-                    handler.postDelayed({
+                    /*handler.postDelayed({
                         view.btnTakePhoto.performClick()
                     }, if(interval-timeBeforePhoto>0){
                         interval-timeBeforePhoto
                     } else{
                         1000
-                    })
+                    })*/
+                    val scope = CoroutineScope(Dispatchers.Main)
+                    scope.launch {
+                        delay(if(interval-timeBeforePhoto>0){
+                            interval-timeBeforePhoto
+                        } else{
+                            1000
+                        })
+                        view.btnTakePhoto.performClick()
+                    }
                 } else {
                     counter = 0
                     isDone = true
-                    handler.postDelayed({
+                    /*handler.postDelayed({
                         try {
                             soundManager.playEndSeriesSound(endSound!!)
                         } catch (e: java.lang.Exception) {
                             e.printStackTrace()
                         }
                         it.isEnabled = true
-                    }, 1500)
+                    }, 1500)*/
+                    val scope = CoroutineScope(Dispatchers.Main)
+                    scope.launch {
+                        delay(1500)
+                        try {
+                            soundManager.playEndSeriesSound(endSound)
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
+                        }
+                        it.isEnabled = true
+                    }
                 }
             }
 
@@ -350,7 +385,9 @@ class FotoFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         cameraExecutor.shutdown()
-        mediaPlayer.release()
+        /*mediaPlayer.stop();
+        mediaPlayer.reset()
+        mediaPlayer.release()*/
     }
 
 }
