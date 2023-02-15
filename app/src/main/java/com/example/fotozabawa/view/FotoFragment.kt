@@ -137,7 +137,6 @@ class FotoFragment : Fragment() {
             lastClickTime = SystemClock.elapsedRealtime();
 
             it.isEnabled = false
-            //val handler = Handler(Looper.getMainLooper())
             if (counter < maxPhotos) {
                 Log.w(TAG, "Nadpisuje name: " + fileName)
                 fileName = SimpleDateFormat(
@@ -146,30 +145,19 @@ class FotoFragment : Fragment() {
                     .format(System
                         .currentTimeMillis()) + ".jpg"
                 currentPhotos.add(fileName)
+
+
                 try {
                     soundManager.playBeforePictureSound(beforeSound)
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                 }
-
-                /*handler.postDelayed({
-                    takePhoto(baner, filter)
-                    try {
-                        soundManager.playAfterPictureSound(afterSound)
-                    } catch (e: java.lang.Exception) {
-                        e.printStackTrace()
-                    }
-                }, if(interval-timeBeforePhoto>0){
-                    timeBeforePhoto
-                } else{
-                    1000
-                })*/
                 val scope = CoroutineScope(Dispatchers.Main)
                 scope.launch {
                     delay(if(interval-timeBeforePhoto>0){
                         timeBeforePhoto
                     } else{
-                        1000
+                        2000
                     })
                     takePhoto(baner, filter)
                     try {
@@ -182,33 +170,18 @@ class FotoFragment : Fragment() {
                 counter++
 
                 if (counter < maxPhotos) {
-                    /*handler.postDelayed({
-                        view.btnTakePhoto.performClick()
-                    }, if(interval-timeBeforePhoto>0){
-                        interval-timeBeforePhoto
-                    } else{
-                        1000
-                    })*/
                     val scope = CoroutineScope(Dispatchers.Main)
                     scope.launch {
                         delay(if(interval-timeBeforePhoto>0){
                             interval-timeBeforePhoto
                         } else{
-                            1000
+                            3000
                         })
                         view.btnTakePhoto.performClick()
                     }
                 } else {
                     counter = 0
                     isDone = true
-                    /*handler.postDelayed({
-                        try {
-                            soundManager.playEndSeriesSound(endSound!!)
-                        } catch (e: java.lang.Exception) {
-                            e.printStackTrace()
-                        }
-                        it.isEnabled = true
-                    }, 1500)*/
                     val scope = CoroutineScope(Dispatchers.Main)
                     scope.launch {
                         delay(1500)
@@ -388,6 +361,7 @@ class FotoFragment : Fragment() {
         /*mediaPlayer.stop();
         mediaPlayer.reset()
         mediaPlayer.release()*/
+        soundManager.releaseMediaPlayer()
     }
 
 }

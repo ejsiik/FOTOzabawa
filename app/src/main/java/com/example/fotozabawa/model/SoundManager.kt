@@ -6,6 +6,7 @@ import android.util.Log
 import com.example.fotozabawa.R
 
 class SoundManager(private val context: Context) {
+    private var mediaPlayer: MediaPlayer? = null
     fun playBeforePictureSound(id: Int) {
         val soundId = when (id) {
             0 -> R.raw.notify1
@@ -21,12 +22,19 @@ class SoundManager(private val context: Context) {
             track.reset()
             track.release()
         }*/
-        Log.d("SoundManager", "MediaPlayer created")
+        /*Log.d("SoundManager", "MediaPlayer created")
+        track?.start()
         track?.setOnCompletionListener {
             Log.d("SoundManager", "MediaPlayer released")
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.reset()
             it.release()
-        }
-        track?.start()
+        }*/
+        mediaPlayer?.reset()
+        mediaPlayer = MediaPlayer.create(context, soundId)
+        mediaPlayer?.start()
     }
 
     fun playAfterPictureSound(id: Int) {
@@ -43,12 +51,22 @@ class SoundManager(private val context: Context) {
             track.reset()
             track.release()
         }*/
-        Log.d("SoundManager", "MediaPlayer created")
+        /*Log.d("SoundManager", "MediaPlayer created")
+        track?.start()
         track?.setOnCompletionListener {
             Log.d("SoundManager", "MediaPlayer released")
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.reset()
             it.release()
-        }
-        track?.start()
+        }*/
+        mediaPlayer?.reset()
+        mediaPlayer = MediaPlayer.create(context, soundId)
+        mediaPlayer?.start()
+
+        mediaPlayer?.start()
+
     }
 
     fun playEndSeriesSound(id: Int) {
@@ -65,11 +83,23 @@ class SoundManager(private val context: Context) {
             track.reset()
             track.release()
         }*/
+        /*track?.start()
         Log.d("SoundManager", "MediaPlayer created")
         track?.setOnCompletionListener {
             Log.d("SoundManager", "MediaPlayer released")
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.reset()
             it.release()
-        }
-        track?.start()
+        }*/
+        mediaPlayer?.reset()
+        mediaPlayer = MediaPlayer.create(context, soundId)
+        mediaPlayer?.start()
+    }
+    fun releaseMediaPlayer() {
+        mediaPlayer?.reset()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 }
