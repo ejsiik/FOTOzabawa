@@ -264,7 +264,7 @@ class FotoFragment : Fragment() {
         if(isDone){
             val handler = Handler()
             handler.postDelayed({
-                requestCombinePhotos(baner)
+                requestCombinePhotos(baner, filter)
             }, 5000)
             currentPhotos.clear()
         }
@@ -301,11 +301,10 @@ class FotoFragment : Fragment() {
                 Log.e(TAG, "Save went wrong!")
             }
         })
-
     }
 
-    private fun requestCombinePhotos(baner : Int) {
-        val combineReq = CombinePhotoReq(currentPhotos, baner)
+    private fun requestCombinePhotos(baner : Int, filter: Int) {
+        val combineReq = CombinePhotoReq(currentPhotos, baner, filter)
 
         val result = apiCall.postCombinePhotos(combineReq)
 
@@ -314,37 +313,10 @@ class FotoFragment : Fragment() {
                 call: Call<CombinePhotoRsp>,
                 response: Response<CombinePhotoRsp>
             ) {
-                if (response.isSuccessful) {
-                    val combinePhotoResponse = response.body()
-                    if (combinePhotoResponse != null) {
-                        val base64EncodedPDF = combinePhotoResponse.combinedPhoto
-                        if (!base64EncodedPDF.isNullOrBlank()) {
-                            val pdfBytes = Base64.getDecoder().decode(base64EncodedPDF)
-                            val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                            val file = File(downloadDir, fileName.substring(0, fileName.length-4))
-
-                            var outputStream: OutputStream? = null
-                            try {
-                                outputStream = FileOutputStream(file)
-                                outputStream.write(pdfBytes)
-                            } catch (e: IOException) {
-                                // handle error
-                            } finally {
-                                outputStream?.close()
-                            }
-                            Toast.makeText(context, "PDF file saved in downloads folder", Toast.LENGTH_SHORT).show()
-                        } else {
-                            Toast.makeText(context, "Failed to download PDF file", Toast.LENGTH_SHORT).show()
-                        }
-                    } else {
-                        Log.d(TAG, "Failed to download PDF file - rsp is null")
-                    }
-                } else {
-                    Log.d(TAG, "Failed to download PDF file - rsp in not gut")
-                }
+                Log.d(TAG, "Succes combined!")
             }
             override fun onFailure(call: Call<CombinePhotoRsp>, t: Throwable) {
-                Log.d(TAG, "onFailure - Failed to download PDF file")
+                Log.e(TAG, "Combine went wrong!")
             }
         })
     }
