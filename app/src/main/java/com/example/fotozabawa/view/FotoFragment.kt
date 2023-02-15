@@ -29,6 +29,7 @@ import com.example.fotozabawa.databinding.FragmentFotoBinding
 import com.example.fotozabawa.model.SoundManager
 import com.example.fotozabawa.model.entity.PhotoEntity
 import com.example.fotozabawa.network.*
+import com.example.fotozabawa.viewmodel.FotoViewModel
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
 import kotlinx.coroutines.CoroutineScope
@@ -134,9 +135,9 @@ class FotoFragment : Fragment() {
             if (SystemClock.elapsedRealtime() - lastClickTime < 800){
                 return@setOnClickListener;
             }
+
             lastClickTime = SystemClock.elapsedRealtime();
 
-            it.isEnabled = false
             if (counter < maxPhotos) {
                 Log.w(TAG, "Nadpisuje name: " + fileName)
                 fileName = SimpleDateFormat(
@@ -159,38 +160,35 @@ class FotoFragment : Fragment() {
                     } else{
                         2000
                     })
-                    takePhoto(baner, filter)
                     try {
+                        takePhoto(baner, filter)
+                        counter++
                         soundManager.playAfterPictureSound(afterSound)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
-                }
-
-                counter++
-
-                if (counter < maxPhotos) {
-                    val scope = CoroutineScope(Dispatchers.Main)
-                    scope.launch {
-                        delay(if(interval-timeBeforePhoto>0){
-                            interval-timeBeforePhoto
-                        } else{
-                            3000
-                        })
-                        view.btnTakePhoto.performClick()
-                    }
-                } else {
-                    counter = 0
-                    isDone = true
-                    val scope = CoroutineScope(Dispatchers.Main)
-                    scope.launch {
-                        delay(1500)
-                        try {
-                            soundManager.playEndSeriesSound(endSound)
-                        } catch (e: java.lang.Exception) {
-                            e.printStackTrace()
+                    if (counter < maxPhotos) {
+                        val scope2 = CoroutineScope(Dispatchers.Main)
+                        scope2.launch {
+                            delay(if(interval-timeBeforePhoto>0){
+                                interval-timeBeforePhoto
+                            } else{
+                                3000
+                            })
+                            view.btnTakePhoto.performClick()
                         }
-                        it.isEnabled = true
+                    } else {
+                        counter = 0
+                        isDone = true
+                        val scope = CoroutineScope(Dispatchers.Main)
+                        scope.launch {
+                            delay(1500)
+                            try {
+                                soundManager.playEndSeriesSound(endSound)
+                            } catch (e: java.lang.Exception) {
+                                e.printStackTrace()
+                            }
+                        }
                     }
                 }
             }
