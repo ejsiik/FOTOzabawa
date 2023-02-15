@@ -216,7 +216,7 @@ class SettingsFragment : Fragment() {
         context?.let {
             ArrayAdapter.createFromResource(
                 it,
-                R.array.sound_array,
+                R.array.baner_array,
                 android.R.layout.simple_spinner_item
             ).also { adapter ->
                 // Specify the layout to use when the list of choices appears
@@ -240,7 +240,7 @@ class SettingsFragment : Fragment() {
         context?.let {
             ArrayAdapter.createFromResource(
                 it,
-                R.array.sound_array,
+                R.array.filter_array,
                 android.R.layout.simple_spinner_item
             ).also { adapter ->
                 // Specify the layout to use when the list of choices appears
