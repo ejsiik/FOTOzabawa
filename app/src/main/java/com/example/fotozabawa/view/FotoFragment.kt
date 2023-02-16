@@ -95,21 +95,26 @@ class FotoFragment : Fragment() {
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
         fotoViewModel = ViewModelProvider(this)[FotoViewModel::class.java]
 
-        val model = Model (0, interval.toString(), maxPhotos.toString(), beforeSound, afterSound, endSound, timeBeforePhoto.toString(), baner, filter)
-        viewModel.addSettings(model)
+
         var counter = 0
 
         lifecycleScope.launch(Dispatchers.IO){
             val tmpModel = viewModel.getSettings()
-            tmpModel?.let {
-                maxPhotos = it.count.toInt()
-                interval = it.time.toLong() * 1000
-                beforeSound = it.soundBefore
-                afterSound = it.soundAfter
-                endSound = it.soundFinish
-                timeBeforePhoto = it.timeBeforePhotoSound.toLong() * 1000
-                baner = it.baner
-                filter = it.filter
+            if (tmpModel == null) {
+                val model = Model (0, interval.toString(), maxPhotos.toString(), beforeSound, afterSound, endSound,
+                        timeBeforePhoto.toString(), baner, filter)
+                viewModel.addSettings(model)
+            } else {
+                tmpModel?.let {
+                    maxPhotos = it.count.toInt()
+                    interval = it.time.toLong() * 1000
+                    beforeSound = it.soundBefore
+                    afterSound = it.soundAfter
+                    endSound = it.soundFinish
+                    timeBeforePhoto = it.timeBeforePhotoSound.toLong() * 1000
+                    baner = it.baner
+                    filter = it.filter
+                }
             }
         }
 
