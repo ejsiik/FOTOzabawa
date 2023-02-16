@@ -1,11 +1,13 @@
 package com.example.fotozabawa.view
 
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.media.MediaPlayer
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
-import android.os.Handler
+import android.os.*
+import android.util.Base64.decode
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,16 +27,27 @@ import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.databinding.FragmentFotoBinding
 import com.example.fotozabawa.model.SoundManager
+import com.example.fotozabawa.model.entity.PhotoEntity
+import com.example.fotozabawa.network.*
+import com.example.fotozabawa.viewmodel.FotoViewModel
 import com.example.fotozabawa.viewmodel.SettingsViewModel
 import kotlinx.android.synthetic.main.fragment_foto.view.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
+import kotlin.collections.ArrayList
 
 class FotoFragment : Fragment() {
 
@@ -45,11 +58,19 @@ class FotoFragment : Fragment() {
 
     private lateinit var binding: FragmentFotoBinding
     private var imageCapture: ImageCapture? = null
-    private lateinit var outputDirectory: File
-    private lateinit var cameraExecutor: ExecutorService
+
     private lateinit var mediaPlayer: MediaPlayer
+
     private lateinit var viewModel: SettingsViewModel
+    private lateinit var fotoViewModel: FotoViewModel
+
     private lateinit var soundManager: SoundManager
+
+    private lateinit var currentPhotos: ArrayList<String>
+
+    lateinit var fileName: String
+
+    private var isDone = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,15 +79,24 @@ class FotoFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_foto, container, false)
         soundManager = SoundManager(requireContext())
 
+
         var maxPhotos: Int = 2
         var interval: Long = 5000
         var beforeSound: Int = 1
         var afterSound: Int = 2
         var endSound: Int = 3
         var timeBeforePhoto: Long = 1000
+        var lastClickTime: Long = 0
+        var baner: Int = 1
+        var filter: Int = 1
 
         binding = FragmentFotoBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
+        fotoViewModel = ViewModelProvider(this)[FotoViewModel::class.java]
+
+
+
+
 
         var counter = 0
 
@@ -79,11 +109,17 @@ class FotoFragment : Fragment() {
                 afterSound = it.soundAfter
                 endSound = it.soundFinish
                 timeBeforePhoto = it.timeBeforePhotoSound.toLong() * 1000
+                baner = it.baner
+                filter = it.filter
             }
         }
 
-        outputDirectory = getOutputDirectory()
-        cameraExecutor = Executors.newSingleThreadExecutor()
+
+
+
+        currentPhotos = ArrayList(maxPhotos)
+
+        fileName = ""
 
         if (allPermissionGranted()) {
             startCamera()
@@ -97,43 +133,72 @@ class FotoFragment : Fragment() {
         }
 
         view.btnTakePhoto.setOnClickListener {
-            val handler = Handler()
+            // mis-clicking prevention, using threshold of 800 ms
+            if (SystemClock.elapsedRealtime() - lastClickTime < 800){
+                return@setOnClickListener;
+            }
+
+            lastClickTime = SystemClock.elapsedRealtime();
+
             if (counter < maxPhotos) {
-                try { // play the sound
+                Log.w(TAG, "Nadpisuje name: " + fileName)
+                fileName = SimpleDateFormat(
+                    FILE_NAME_FORMAT,
+                    Locale.getDefault())
+                    .format(System
+                        .currentTimeMillis()) + ".jpg"
+                currentPhotos.add(fileName)
+
+
+                try {
                     soundManager.playBeforePictureSound(beforeSound)
-                    handler.postDelayed({
-                        takePhoto()
-                    }, if(interval-timeBeforePhoto>0){
-                        interval-timeBeforePhoto
-                    } else{
-                        900
-                    })
-                    counter++
-                    try {
-                        soundManager.playAfterPictureSound(afterSound)
-                    } catch (e: java.lang.Exception) {
-                        e.printStackTrace()
-                    }
                 } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                 }
-                if (counter < maxPhotos) {
-                        handler.postDelayed({
+                val scope = CoroutineScope(Dispatchers.Main)
+                scope.launch {
+                    delay(if(interval-timeBeforePhoto>0){
+                        timeBeforePhoto
+                    } else{
+                        2000
+                    })
+                    try {
+                        imageCapture?.let { it1 -> fotoViewModel.takePhoto(fileName, it1) }
+                        counter++
+                        soundManager.playAfterPictureSound(afterSound)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                    if (counter < maxPhotos) {
+                        val scope2 = CoroutineScope(Dispatchers.Main)
+                        scope2.launch {
+                            delay(if(interval-timeBeforePhoto>0){
+                                interval-timeBeforePhoto
+                            } else{
+                                3000
+                            })
                             view.btnTakePhoto.performClick()
-                        }, if(interval-timeBeforePhoto>0){
-                            interval-timeBeforePhoto
-                        } else{
-                            900
-                        })
-                } else {
-                    counter = 0
-                    handler.postDelayed({
-                        try {
-                            soundManager.playEndSeriesSound(endSound!!)
-                        } catch (e: java.lang.Exception) {
-                            e.printStackTrace()
                         }
-                    }, 1000)
+                    } else {
+                        counter = 0
+                        isDone = true
+                        val scope3 = CoroutineScope(Dispatchers.Main)
+                        scope3.launch {
+                            delay(3500)
+                            try {
+                                soundManager.playEndSeriesSound(endSound)
+                            } catch (e: java.lang.Exception) {
+                                e.printStackTrace()
+                            }
+                            if(isDone){
+                                val handler = Handler()
+                                handler.postDelayed({
+                                    fotoViewModel.requestCombinePhotos(baner, filter, currentPhotos)
+                                }, 5000)
+                                currentPhotos.clear()
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -142,7 +207,6 @@ class FotoFragment : Fragment() {
         }
         return view
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -162,52 +226,8 @@ class FotoFragment : Fragment() {
         }
     }
 
-    private fun getOutputDirectory(): File{
-        val mediaDir = requireContext().getExternalFilesDirs(null).firstOrNull()?.let { mFile->
-            File(mFile, "FOTOzabawa").apply {
-                mkdirs()
-            }
-        }
-        return if (mediaDir != null && mediaDir.exists())
-            mediaDir else requireContext().filesDir
-    }
-
     private fun openMenu() {
         findNavController().navigate(R.id.action_fotoFragment_to_settingsFragment)
-    }
-
-    private fun takePhoto() {
-        val imageCapture = imageCapture ?: return
-        val photoFile = File( outputDirectory,
-            SimpleDateFormat(
-                FILE_NAME_FORMAT,
-                Locale.getDefault())
-                .format(System
-                    .currentTimeMillis()) + ".jpg")
-
-        val outputOption = ImageCapture
-            .OutputFileOptions
-            .Builder(photoFile)
-            .build()
-
-        imageCapture.takePicture(
-            outputOption, ContextCompat.getMainExecutor(requireContext()),
-            object :ImageCapture.OnImageSavedCallback{
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo Saved"
-
-                    /*Toast.makeText(requireContext(),
-                        "$msg $savedUri",
-                        Toast.LENGTH_SHORT
-                    ).show()*/
-                }
-
-                override fun onError(exception: ImageCaptureException) {
-                    Log.e(TAG, "onError: ${exception.message}",exception)
-                }
-            }
-        )
     }
 
     private fun startCamera() {
@@ -241,8 +261,12 @@ class FotoFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
-        mediaPlayer.release()
+        fotoViewModel.cameraExecutorShutDown()
+        /*mediaPlayer.stop();
+        mediaPlayer.reset()
+        mediaPlayer.release()*/
+        soundManager.releaseMediaPlayer()
     }
 
 }
+

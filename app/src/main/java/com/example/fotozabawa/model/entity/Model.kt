@@ -11,5 +11,7 @@ data class Model (
     val soundBefore : Int,
     val soundAfter : Int,
     val soundFinish : Int,
-    val timeBeforePhotoSound: String
+    val timeBeforePhotoSound: String,
+    val baner: Int,
+    val filter: Int
     )

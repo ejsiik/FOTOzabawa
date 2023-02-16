@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="baner_array">
+        <item>Flames</item>
+        <item>Water</item>
+        <item>Clouds</item>
+        <item>Earth</item>
+    </string-array>
+</resources>
