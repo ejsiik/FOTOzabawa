@@ -27,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.fotozabawa.R
 import com.example.fotozabawa.databinding.FragmentFotoBinding
 import com.example.fotozabawa.model.SoundManager
+import com.example.fotozabawa.model.entity.Model
 import com.example.fotozabawa.model.entity.PhotoEntity
 import com.example.fotozabawa.network.*
 import com.example.fotozabawa.viewmodel.FotoViewModel
@@ -94,10 +95,8 @@ class FotoFragment : Fragment() {
         viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
         fotoViewModel = ViewModelProvider(this)[FotoViewModel::class.java]
 
-
-
-
-
+        val model = Model (0, interval.toString(), maxPhotos.toString(), beforeSound, afterSound, endSound, timeBeforePhoto.toString(), baner, filter)
+        viewModel.addSettings(model)
         var counter = 0
 
         lifecycleScope.launch(Dispatchers.IO){
