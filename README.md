@@ -2,7 +2,7 @@
 Repozytorium dla zadania projektowego na przedmiocie Aplikacje Mobilne Systemu Android, Wydział Matematyki Stosowanej, Politechnika Śląska 2022/2023.
 
 ## Autors
-- [Patryk Typek]()
+- [Patryk Typek](https://github.com/ptypek)
 - [Dawid Wydra](https://github.com/ejsiik)
 
 ## About
